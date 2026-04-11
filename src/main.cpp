@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <string>
@@ -20,10 +21,16 @@ const GameSettings GSettings = {
 
 
 struct Colors {
-	sf::Color up = sf::Color::Blue;
+	sf::Color up = sf::Color::White;
 	sf::Color down = sf::Color::Green;
 	sf::Color left = sf::Color::Red;
 	sf::Color right = sf::Color::Yellow;
+};
+
+
+struct Entity {
+	float velocity;
+	sf::RectangleShape rect;
 };
 
 Colors GColors;
@@ -35,10 +42,13 @@ int main (int argc, char *argv[]) {
 	window.setFramerateLimit(60);
 
 
-	sf::RectangleShape rect;
-	rect.setSize(sf::Vector2f(20,20));
-	rect.setPosition({(float)GSettings.width/2-10, (float)GSettings.height/2-10});
+	Entity player {.velocity = 100.0f,
+					.rect = sf::RectangleShape({20.0f, 20.0f})};
 
+	player.rect.setSize(sf::Vector2f(20,20));
+	player.rect.setPosition({(float)GSettings.width/2-10, (float)GSettings.height/2-10});
+
+	sf::Clock clock;
 	while(window.isOpen()){
 	
 		while(const auto event = window.pollEvent()){
@@ -47,27 +57,30 @@ int main (int argc, char *argv[]) {
 			}
 		}
 		window.clear();
-		window.draw(rect);
 
+		float time = clock.restart().asSeconds();
+		auto& rect = player.rect;
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)){
 			rect.setFillColor(GColors.up);
-			rect.move({0, -5.0f});
+			rect.move({0, -1.0f * player.velocity * time});
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)){
 			rect.setFillColor(GColors.down);
-			rect.move({0, 5.0f});
+			rect.move({0, player.velocity * time});
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)){
 			rect.setFillColor(GColors.left);
-			rect.move({-5.0f, 0});
+			rect.move({ -1.0f * player.velocity * time, 0});
 		}
 		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)){
 			rect.setFillColor(GColors.right);
-			rect.move({5.0f, 0});
+			rect.move({player.velocity * time, 0});
 		}
 		if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)){
 			window.close();
 		}
+
+		window.draw(rect);
 		window.display();
 	}
  
