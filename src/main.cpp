@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
@@ -11,27 +12,34 @@ struct GameSettings {
     std::string name;
     unsigned width;
     unsigned height;
+
+    float groundY;
 };
 
 const GameSettings GSettings = {
-    .name = "ThePlayer",
-    .width = 720,
-    .height = 360,
-};
+    .name = "ThePlayer", .width = 640, .height = 640, .groundY = 320.0f + 40 + 20};
 
 struct Colors {
-    sf::Color up = sf::Color::White;
+    sf::Color up = sf::Color::Cyan;
     sf::Color down = sf::Color::Green;
     sf::Color left = sf::Color::Red;
     sf::Color right = sf::Color::Yellow;
+    sf::Color idle = sf::Color::White;
 };
 
 struct Entity {
-    float velocity;
+    sf::Vector2f velocity;
     sf::RectangleShape rect;
+    float gravity;
+    float jumpforce;
 };
 
 Colors GColors;
+
+
+bool isGrounded(const sf::RectangleShape &rect) {
+    return rect.getPosition().y + rect.getSize().y >= GSettings.groundY;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -39,14 +47,37 @@ int main(int argc, char *argv[]) {
                             GSettings.name);
     window.setFramerateLimit(60);
 
-    Entity player{.velocity = 100.0f,
-                  .rect = sf::RectangleShape({20.0f, 20.0f})};
+    sf::RectangleShape groundLine({GSettings.width * 1.0f, 2});
+    groundLine.setFillColor(sf::Color::Red);
+    groundLine.setPosition({0, GSettings.groundY});
 
-    player.rect.setSize(sf::Vector2f(20, 20));
+    Entity player{.velocity = {100.0f, 0.0},
+                  .rect = sf::RectangleShape({20.0f, 20.0f}),
+                  .gravity = 800.0f,
+                  .jumpforce = 350.0f};
+
     player.rect.setPosition(
-        {(float)GSettings.width / 2 - 10, (float)GSettings.height / 2 - 10});
+        //{(float)GSettings.width / 2 - 10, (float)GSettings.height / 2 + 40});
+        {(float)GSettings.width / 2 - 10, GSettings.groundY - player.rect.getSize().y});
+
+    sf::Texture bgTexture;
+
+    if (!bgTexture.loadFromFile("assets/bg.png")) {
+        std::cerr << "Error loading background image;\n";
+        exit(EXIT_FAILURE);
+    }
+#if 0
+    if(!bgTexture.resize({720, 720})){
+        std::cerr << "Error resizeing background image";
+        exit(EXIT_FAILURE);
+    }
+#endif
+    sf::Sprite bgSprite(bgTexture);
+    bgSprite.setPosition({0.0f, 0.0f});
 
     sf::Clock clock;
+
+    //std::cout << player.rect.getPosition().y << "\n";
     while (window.isOpen()) {
 
         while (const auto event = window.pollEvent()) {
@@ -55,27 +86,53 @@ int main(int argc, char *argv[]) {
             }
         }
         window.clear();
+        window.draw(bgSprite);
 
         float time = clock.restart().asSeconds();
         auto &rect = player.rect;
+        rect.setFillColor(GColors.idle);
+
+        if(!isGrounded(rect)){
+            player.velocity.y += player.gravity * time;
+        }
+        if (rect.getPosition().y >= GSettings.groundY) {
+            rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
+            player.velocity.y = 0;
+        }
+
+        rect.move({0.0f, player.velocity.y * time});
+
+        if (isGrounded(rect) &&
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
+            player.velocity.y = -player.jumpforce;
+        }
+
+
+#if 0
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
             rect.setFillColor(GColors.up);
-            rect.move({0, -1.0f * player.velocity * time});
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+            rect.move({0, -1.0f * player.velocity.x * time});
+        } 
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
             rect.setFillColor(GColors.down);
-            rect.move({0, player.velocity * time});
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+            rect.move({0, player.velocity.x * time});
+        }
+#endif
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
             rect.setFillColor(GColors.left);
-            rect.move({-1.0f * player.velocity * time, 0});
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+            rect.move({-1.0f * player.velocity.x * time, 0});
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
             rect.setFillColor(GColors.right);
-            rect.move({player.velocity * time, 0});
+            rect.move({player.velocity.x * time, 0});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
         }
 
         window.draw(rect);
+        window.draw(groundLine);
         window.display();
     }
 
