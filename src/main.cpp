@@ -16,8 +16,10 @@ struct GameSettings {
     float groundY;
 };
 
-const GameSettings GSettings = {
-    .name = "ThePlayer", .width = 640, .height = 640, .groundY = 320.0f + 40 + 20};
+const GameSettings GSettings = {.name = "ThePlayer",
+                                .width = 640,
+                                .height = 640,
+                                .groundY = 320.0f + 40 + 20};
 
 struct Colors {
     sf::Color up = sf::Color::Cyan;
@@ -28,14 +30,15 @@ struct Colors {
 };
 
 struct Entity {
+    float baseVelocity;
     sf::Vector2f velocity;
     sf::RectangleShape rect;
     float gravity;
     float jumpforce;
+    float friction;
 };
 
 Colors GColors;
-
 
 bool isGrounded(const sf::RectangleShape &rect) {
     return rect.getPosition().y + rect.getSize().y >= GSettings.groundY;
@@ -51,14 +54,17 @@ int main(int argc, char *argv[]) {
     groundLine.setFillColor(sf::Color::Red);
     groundLine.setPosition({0, GSettings.groundY});
 
-    Entity player{.velocity = {100.0f, 0.0},
+    Entity player{.baseVelocity = 100.0f,
+                  .velocity = {0.0f, 0.0},
                   .rect = sf::RectangleShape({20.0f, 20.0f}),
                   .gravity = 800.0f,
-                  .jumpforce = 350.0f};
+                  .jumpforce = 350.0f,
+                  .friction = 0.9f};
 
     player.rect.setPosition(
         //{(float)GSettings.width / 2 - 10, (float)GSettings.height / 2 + 40});
-        {(float)GSettings.width / 2 - 10, GSettings.groundY - player.rect.getSize().y});
+        {(float)GSettings.width / 2 - 10,
+         GSettings.groundY - player.rect.getSize().y});
 
     sf::Texture bgTexture;
 
@@ -77,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     sf::Clock clock;
 
-    //std::cout << player.rect.getPosition().y << "\n";
+    // std::cout << player.rect.getPosition().y << "\n";
     while (window.isOpen()) {
 
         while (const auto event = window.pollEvent()) {
@@ -92,11 +98,12 @@ int main(int argc, char *argv[]) {
         auto &rect = player.rect;
         rect.setFillColor(GColors.idle);
 
-        if(!isGrounded(rect)){
+        if (!isGrounded(rect)) {
             player.velocity.y += player.gravity * time;
         }
         if (rect.getPosition().y >= GSettings.groundY) {
-            rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
+            rect.setPosition(
+                {rect.getPosition().x, GSettings.groundY - rect.getSize().y});
             player.velocity.y = 0;
         }
 
@@ -106,8 +113,13 @@ int main(int argc, char *argv[]) {
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
             player.velocity.y = -player.jumpforce;
         }
+        if (player.velocity.x < 0.000005 || player.velocity.x > -0.000005) {
+            player.velocity.x = 0;
+        }
 
-
+        if (player.velocity.x != 0) {
+            player.velocity.x *= player.friction;
+        }
 #if 0
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
             rect.setFillColor(GColors.up);
@@ -121,15 +133,20 @@ int main(int argc, char *argv[]) {
 #endif
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
             rect.setFillColor(GColors.left);
-            rect.move({-1.0f * player.velocity.x * time, 0});
+            player.velocity.x = -1.0f * player.baseVelocity;
+            // rect.move({-1.0f * player.velocity.x * time, 0});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
             rect.setFillColor(GColors.right);
-            rect.move({player.velocity.x * time, 0});
+            player.velocity.x = 1.0f * player.baseVelocity;
+            // rect.move({player.velocity.x * time, 0});
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
+            std::cout << "Player.velocity.x : " << player.velocity.x << "\n";
         }
+
+        rect.move({player.velocity.x * time, 0});
 
         window.draw(rect);
         window.draw(groundLine);
