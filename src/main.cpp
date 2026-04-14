@@ -101,13 +101,21 @@ int main(int argc, char *argv[]) {
         if (!isGrounded(rect)) {
             player.velocity.y += player.gravity * time;
         }
-        if (rect.getPosition().y >= GSettings.groundY) {
+        if (player.velocity.y > 0 && rect.getPosition().y + rect.getSize().y >= GSettings.groundY) {
+            //std::cout << "below ground\n";
             rect.setPosition(
                 {rect.getPosition().x, GSettings.groundY - rect.getSize().y});
             player.velocity.y = 0;
         }
 
-        rect.move({0.0f, player.velocity.y * time});
+        float offsetY = player.velocity.y * time;
+        // offsetY = std::min(GSettings.groundY - rect.getPosition().y,
+        float newPosY = rect.getPosition().y + rect.getSize().y + offsetY;
+        if (newPosY > GSettings.groundY) {
+            //std::cout << "Possibility to move below ground\n";
+            offsetY = GSettings.groundY - (rect.getPosition().y + rect.getSize().y);
+        }
+        rect.move({0.0f, offsetY});
 
         if (isGrounded(rect) &&
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
@@ -143,7 +151,6 @@ int main(int argc, char *argv[]) {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
-            std::cout << "Player.velocity.x : " << player.velocity.x << "\n";
         }
 
         rect.move({player.velocity.x * time, 0});
