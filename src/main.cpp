@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
             player.velocity.y += player.gravity * time;
         }
         if (player.velocity.y > 0 && rect.getPosition().y + rect.getSize().y >= GSettings.groundY) {
-            //std::cout << "below ground\n";
+            std::cout << "below ground\n";
             rect.setPosition(
                 {rect.getPosition().x, GSettings.groundY - rect.getSize().y});
             player.velocity.y = 0;
@@ -112,8 +112,9 @@ int main(int argc, char *argv[]) {
         // offsetY = std::min(GSettings.groundY - rect.getPosition().y,
         float newPosY = rect.getPosition().y + rect.getSize().y + offsetY;
         if (newPosY > GSettings.groundY) {
-            //std::cout << "Possibility to move below ground\n";
-            offsetY = GSettings.groundY - (rect.getPosition().y + rect.getSize().y);
+            std::cout << "Possibility to move below ground\n";
+            //offsetY = GSettings.groundY - (rect.getPosition().y + rect.getSize().y);
+            offsetY -= (newPosY-GSettings.groundY);
         }
         rect.move({0.0f, offsetY});
 
