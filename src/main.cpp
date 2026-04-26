@@ -44,6 +44,9 @@ bool isGrounded(const sf::RectangleShape &rect) {
     return rect.getPosition().y + rect.getSize().y >= GSettings.groundY;
 }
 
+bool isBelowGround(const sf::RectangleShape &rect) {
+    return rect.getPosition().y + rect.getSize().y > GSettings.groundY;
+}
 int main(int argc, char *argv[]) {
 
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
@@ -98,30 +101,25 @@ int main(int argc, char *argv[]) {
         auto &rect = player.rect;
         rect.setFillColor(GColors.idle);
 
+
+        // handle 'y' direction
+        
         if (!isGrounded(rect)) {
             player.velocity.y += player.gravity * time;
         }
-        if (player.velocity.y > 0 && rect.getPosition().y + rect.getSize().y >= GSettings.groundY) {
-            std::cout << "below ground\n";
-            rect.setPosition(
-                {rect.getPosition().x, GSettings.groundY - rect.getSize().y});
-            player.velocity.y = 0;
-        }
-
         float offsetY = player.velocity.y * time;
-        // offsetY = std::min(GSettings.groundY - rect.getPosition().y,
-        float newPosY = rect.getPosition().y + rect.getSize().y + offsetY;
-        if (newPosY > GSettings.groundY) {
-            std::cout << "Possibility to move below ground\n";
-            //offsetY = GSettings.groundY - (rect.getPosition().y + rect.getSize().y);
-            offsetY -= (newPosY-GSettings.groundY);
-        }
-        rect.move({0.0f, offsetY});
-
         if (isGrounded(rect) &&
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
             player.velocity.y = -player.jumpforce;
         }
+
+        
+        rect.move({0.0f, offsetY});
+        if(isBelowGround(rect)){
+            rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
+        }
+
+        
         if (player.velocity.x < 0.000005 || player.velocity.x > -0.000005) {
             player.velocity.x = 0;
         }
