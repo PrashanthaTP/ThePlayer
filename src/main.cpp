@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
         rect.setFillColor(GColors.idle);
 
 
-        // handle 'y' direction
+        // ---------------  handle 'y' direction ----------------------
         
         if (!isGrounded(rect)) {
             player.velocity.y += player.gravity * time;
@@ -119,25 +119,9 @@ int main(int argc, char *argv[]) {
             rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
         }
 
-        
-        if (player.velocity.x < 0.000005 || player.velocity.x > -0.000005) {
-            player.velocity.x = 0;
-        }
+    
+        // ---------------  handle 'x' direction ----------------------
 
-        if (player.velocity.x != 0) {
-            player.velocity.x *= player.friction;
-        }
-#if 0
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-            rect.setFillColor(GColors.up);
-            rect.move({0, -1.0f * player.velocity.x * time});
-        } 
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-            rect.setFillColor(GColors.down);
-            rect.move({0, player.velocity.x * time});
-        }
-#endif
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
             rect.setFillColor(GColors.left);
             player.velocity.x = -1.0f * player.baseVelocity;
@@ -148,11 +132,16 @@ int main(int argc, char *argv[]) {
             player.velocity.x = 1.0f * player.baseVelocity;
             // rect.move({player.velocity.x * time, 0});
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-            window.close();
+        
+        if (player.velocity.x != 0) { // apply friction when player is moving
+            player.velocity.x *= player.friction;
         }
 
         rect.move({player.velocity.x * time, 0});
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
+            window.close();
+        }
 
         window.draw(rect);
         window.draw(groundLine);
