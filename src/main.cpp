@@ -45,7 +45,7 @@ struct Entity {
 Colors GColors;
 
 bool isGrounded(const sf::RectangleShape &rect) {
-    return rect.getPosition().y + rect.getSize().y >= GSettings.groundY;
+    return rect.getPosition().y + rect.getSize().y == GSettings.groundY;
 }
 
 bool isBelowGround(const sf::RectangleShape &rect) {
@@ -124,10 +124,12 @@ int main(int argc, char *argv[]) {
         rect.move({0.0f, offsetY});
         if(isBelowGround(rect)){
             rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
+        }
+        if(player.velocity.y > 0 && isGrounded(rect)) {
+            cout << "Set velocity.y to zero\n";
             player.velocity.y = 0;
         }
 
-    
         // ---------------  handle 'x' direction ----------------------
 
         bool isMoving = false;
