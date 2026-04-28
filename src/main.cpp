@@ -5,6 +5,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using std::cout;
 
@@ -31,6 +32,9 @@ struct Colors {
 
 struct Entity {
     float baseVelocity;
+    float acceleration;
+    float maxVelocity;
+    float minVelocity;
     sf::Vector2f velocity;
     sf::RectangleShape rect;
     float gravity;
@@ -58,7 +62,10 @@ int main(int argc, char *argv[]) {
     groundLine.setFillColor(sf::Color::Red);
     groundLine.setPosition({0, GSettings.groundY});
 
-    Entity player{.baseVelocity = 100.0f,
+    Entity player{.baseVelocity = 300.0f,
+                  .acceleration = 900.0f,
+                  .maxVelocity = 400.0f,
+                  .minVelocity = -400.0f,
                   .velocity = {0.0f, 0.0},
                   .rect = sf::RectangleShape({20.0f, 20.0f}),
                   .gravity = 800.0f,
@@ -123,26 +130,43 @@ int main(int argc, char *argv[]) {
     
         // ---------------  handle 'x' direction ----------------------
 
+        bool isMoving = false;
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
             rect.setFillColor(GColors.left);
-            player.velocity.x = -1.0f * player.baseVelocity;
-            // rect.move({-1.0f * player.velocity.x * time, 0});
+            //player.velocity.x = std::min(player.velocity.x, 0.0f);//helps when suddenly switching from different direction
+            if (player.velocity.x > 0) {
+                player.velocity.x *= 0.5f; //damp since changing direction now
+            }
+            player.velocity.x += -1.0f * player.acceleration * time;
+            isMoving = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
             rect.setFillColor(GColors.right);
-            player.velocity.x = 1.0f * player.baseVelocity;
-            // rect.move({player.velocity.x * time, 0});
+            //player.velocity.x = std::max(player.velocity.x, 0.0f);//helps when suddenly switching from different direction
+            if (player.velocity.x < 0) {
+                player.velocity.x *= 0.5f; //damp since changing direction now
+            }
+            player.velocity.x += 1.0f * player.acceleration * time;
+            isMoving = true;
         }
         
-        if (player.velocity.x != 0) { // apply friction when player is moving
+        if (!isMoving) {//apply when (A/D) key not pressed
+            //Move velocity towards zero
             player.velocity.x *= player.friction;
         }
+        if( std::abs(player.velocity.x) < 0.01f) {
+            player.velocity.x = 0;
+        }
+
+        player.velocity.x = std::clamp(player.velocity.x, player.minVelocity, player.maxVelocity);
 
         rect.move({player.velocity.x * time, 0});
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
         }
+
 
         window.draw(rect);
         window.draw(groundLine);
