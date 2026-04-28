@@ -47,6 +47,7 @@ bool isGrounded(const sf::RectangleShape &rect) {
 bool isBelowGround(const sf::RectangleShape &rect) {
     return rect.getPosition().y + rect.getSize().y > GSettings.groundY;
 }
+
 int main(int argc, char *argv[]) {
 
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
@@ -107,16 +108,16 @@ int main(int argc, char *argv[]) {
         if (!isGrounded(rect)) {
             player.velocity.y += player.gravity * time;
         }
-        float offsetY = player.velocity.y * time;
         if (isGrounded(rect) &&
             sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
             player.velocity.y = -player.jumpforce;
         }
-
+        float offsetY = player.velocity.y * time;
         
         rect.move({0.0f, offsetY});
         if(isBelowGround(rect)){
             rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
+            player.velocity.y = 0;
         }
 
     
