@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -52,6 +53,17 @@ bool isBelowGround(const sf::RectangleShape &rect) {
     return rect.getPosition().y + rect.getSize().y > GSettings.groundY;
 }
 
+
+sf::RectangleShape addBoundingBox(const sf::RenderWindow& window, const sf::Sprite sprite){
+    sf::FloatRect rect = sprite.getGlobalBounds();
+    sf::RectangleShape resRect(sf::Vector2f(rect.size.x, rect.size.y));
+    resRect.setOutlineColor(sf::Color::Red);
+    resRect.setFillColor(sf::Color::Transparent);
+    resRect.setOutlineThickness(2.0f);
+    resRect.setPosition({rect.position.x, rect.position.y});
+    return resRect;
+}
+
 int main(int argc, char *argv[]) {
 
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
@@ -83,6 +95,8 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading background image;\n";
         exit(EXIT_FAILURE);
     }
+
+
 #if 0
     if(!bgTexture.resize({720, 720})){
         std::cerr << "Error resizeing background image";
@@ -91,6 +105,20 @@ int main(int argc, char *argv[]) {
 #endif
     sf::Sprite bgSprite(bgTexture);
     bgSprite.setPosition({0.0f, 0.0f});
+
+    sf::Texture treeTexture;
+    if (!treeTexture.loadFromFile("assets/experiment/02_tree.png")) {
+        std::cerr << "Error loading tree image;\n";
+        exit(EXIT_FAILURE);
+    }
+    sf::Sprite treeSprite(treeTexture);
+    treeSprite.setPosition({100.0f, GSettings.groundY-treeTexture.getSize().y});
+    sf::Sprite treeSprite2(treeTexture);
+    treeSprite2.setPosition({400.0f, GSettings.groundY-treeTexture.getSize().y});
+
+
+
+    sf::RectangleShape boundingBox = addBoundingBox(window, treeSprite2);
 
     sf::Clock clock;
 
@@ -104,6 +132,9 @@ int main(int argc, char *argv[]) {
         }
         window.clear();
         window.draw(bgSprite);
+        window.draw(treeSprite);
+        window.draw(treeSprite2);
+        window.draw(boundingBox);
 
         float time = clock.restart().asSeconds();
         auto &rect = player.rect;
@@ -126,7 +157,6 @@ int main(int argc, char *argv[]) {
             rect.setPosition({rect.getPosition().x, GSettings.groundY - rect.getSize().y});
         }
         if(player.velocity.y > 0 && isGrounded(rect)) {
-            cout << "Set velocity.y to zero\n";
             player.velocity.y = 0;
         }
 
@@ -153,7 +183,7 @@ int main(int argc, char *argv[]) {
             isMoving = true;
         }
         
-        if (!isMoving) {//apply when (A/D) key not pressed
+        if (!isMoving) {//apply when (A/D) key not pressed so that actually meant speed not affected
             //Move velocity towards zero
             player.velocity.x *= player.friction;
         }
@@ -163,7 +193,39 @@ int main(int argc, char *argv[]) {
 
         player.velocity.x = std::clamp(player.velocity.x, player.minVelocity, player.maxVelocity);
 
+
+        float newX = rect.getPosition().x + rect.getSize().x + player.velocity.x * time;
+        float rightX= rect.getPosition().x + rect.getSize().x + player.velocity.x * time;
+        float leftX = rightX - rect.getSize().x;
+        float wallLeftX = treeSprite2.getGlobalBounds().position.x;
+        float wallRightX = treeSprite2.getGlobalBounds().position.x + treeSprite2.getGlobalBounds().size.x;
+        float topY = rect.getPosition().y;
+        float wallTopY = treeSprite2.getGlobalBounds().position.y;
+        float bottomY = rect.getPosition().y + rect.getSize().y;
+        float wallBottomY = wallTopY + treeSprite2.getGlobalBounds().size.y;
+        bool collide = false;
+        //float newX = rect.getPosition().x;
+        bool doesIntersect = ((rightX > wallLeftX)
+                              && (leftX < wallRightX)
+                              && (topY <= wallBottomY)
+                             && (bottomY >= wallTopY));
+
+        doesIntersect = rect.getGlobalBounds().findIntersection(treeSprite2.getGlobalBounds()) != std::nullopt;
+        if(doesIntersect) {
+            //intersecting horizontally
+            rect.setFillColor(GColors.down);
+            player.velocity.x = 0;
+            collide = true;
+        }
         rect.move({player.velocity.x * time, 0});
+
+
+        if(collide) {
+            player.velocity.y = -200.0f;
+            player.velocity.x = -200.0f;
+            collide=false;
+        }
+
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
@@ -176,4 +238,4 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
-}
+};
