@@ -111,14 +111,15 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading tree image;\n";
         exit(EXIT_FAILURE);
     }
-    sf::Sprite treeSprite(treeTexture);
-    treeSprite.setPosition({100.0f, GSettings.groundY-treeTexture.getSize().y});
+    sf::Sprite treeSprite1(treeTexture);
+    treeSprite1.setPosition({100.0f, GSettings.groundY-treeTexture.getSize().y});
     sf::Sprite treeSprite2(treeTexture);
     treeSprite2.setPosition({400.0f, GSettings.groundY-treeTexture.getSize().y});
 
 
 
-    sf::RectangleShape boundingBox = addBoundingBox(window, treeSprite2);
+    sf::RectangleShape boundingBox1 = addBoundingBox(window, treeSprite1);
+    sf::RectangleShape boundingBox2 = addBoundingBox(window, treeSprite2);
 
     sf::Clock clock;
 
@@ -132,9 +133,10 @@ int main(int argc, char *argv[]) {
         }
         window.clear();
         window.draw(bgSprite);
-        window.draw(treeSprite);
+        window.draw(treeSprite1);
         window.draw(treeSprite2);
-        window.draw(boundingBox);
+        window.draw(boundingBox1);
+        window.draw(boundingBox2);
 
         float time = clock.restart().asSeconds();
         auto &rect = player.rect;
@@ -193,9 +195,10 @@ int main(int argc, char *argv[]) {
 
         player.velocity.x = std::clamp(player.velocity.x, player.minVelocity, player.maxVelocity);
 
+        rect.move({player.velocity.x * time, 0});
 
-        float newX = rect.getPosition().x + rect.getSize().x + player.velocity.x * time;
-        float rightX= rect.getPosition().x + rect.getSize().x + player.velocity.x * time;
+        //float newX = rect.getPosition().x + rect.getSize().x + player.velocity.x * time;
+        float rightX= rect.getPosition().x + rect.getSize().x ;//+ player.velocity.x * time;
         float leftX = rightX - rect.getSize().x;
         float wallLeftX = treeSprite2.getGlobalBounds().position.x;
         float wallRightX = treeSprite2.getGlobalBounds().position.x + treeSprite2.getGlobalBounds().size.x;
@@ -210,19 +213,38 @@ int main(int argc, char *argv[]) {
                               && (topY <= wallBottomY)
                              && (bottomY >= wallTopY));
 
-        doesIntersect = rect.getGlobalBounds().findIntersection(treeSprite2.getGlobalBounds()) != std::nullopt;
-        if(doesIntersect) {
+        //doesIntersect = rect.getGlobalBounds().findIntersection(treeSprite2.getGlobalBounds()) != std::nullopt;
+        bool doesIntersect2 = rect.getGlobalBounds().findIntersection(treeSprite1.getGlobalBounds()) != std::nullopt;
+        if(doesIntersect || doesIntersect2) {
             //intersecting horizontally
             rect.setFillColor(GColors.down);
-            player.velocity.x = 0;
             collide = true;
+            cout << "Intersect \n";
+
+            //rect.setPosition({treeSprite2.getPosition().x - rect.getSize().x, GSettings.groundY - rect.getSize().y});
+            if(player.velocity.x > 0) {
+                //moving right
+                rect.setPosition({treeSprite2.getPosition().x - rect.getSize().x, rect.getPosition().y});
+
+                #ifdef CLIMIBING_PROBLEM
+                player.velocity.x = -500.0f;
+                player.velocity.y = -200.0f;
+                #endif
+            }else {
+                //moving left
+                rect.setPosition({treeSprite1.getPosition().x + treeSprite1.getGlobalBounds().size.x, rect.getPosition().y});
+                #ifdef CLIMIBING_PROBLEM
+                player.velocity.x = 100.0f;
+                player.velocity.y = -200.0f;
+                #endif
+            }
+            player.velocity.x = 0;
         }
-        rect.move({player.velocity.x * time, 0});
 
 
         if(collide) {
-            player.velocity.y = -200.0f;
-            player.velocity.x = -200.0f;
+            //player.velocity.y = -200.0f;
+            //player.velocity.x = -200.0f;
             collide=false;
         }
 
