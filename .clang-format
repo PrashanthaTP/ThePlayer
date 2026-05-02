@@ -1,5 +1,8 @@
 ---
 # We'll use defaults from the LLVM style, but with 4 columns indentation.
 BasedOnStyle: LLVM
+AlignAfterOpenBracket: true
+BinPackArguments: false
+BinPackParameters: false
 IndentWidth: 4
 ---
