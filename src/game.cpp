@@ -67,7 +67,7 @@ void Engine::handleCollisions(
         std::cout << pLeftX << " | " << pRightX << " | " << pTopY << " | "
                   << pBottomY << "\n";
         bool xColliding = rightX >= pLeftX && leftX <= pRightX;
-        bool yColliding = topY >= pBottomY && bottomY <= pTopY;
+        bool yColliding = topY <= pBottomY && bottomY >= pTopY;
         if (xColliding && yColliding) {
             std::cout << "Collided\n";
             player.handleCollision(platform);
