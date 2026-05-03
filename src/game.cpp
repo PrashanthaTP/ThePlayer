@@ -62,41 +62,48 @@ void Engine::handleCollisions(
         float pRightX = pLeftX + platform.getSize().x;
         float pTopY = platform.getPosition().y;
         float pBottomY = pTopY + platform.getSize().y;
+#ifdef DEBUG
         std::cout << leftX << " | " << rightX << " | " << topY << " | "
                   << bottomY << "\n";
         std::cout << pLeftX << " | " << pRightX << " | " << pTopY << " | "
                   << pBottomY << "\n";
+#endif
         bool xColliding = rightX >= pLeftX && leftX <= pRightX;
         bool yColliding = topY <= pBottomY && bottomY >= pTopY;
         if (xColliding && yColliding) {
-            std::cout << "Collided\n";
             player.handleCollision(platform);
         }
     }
 }
 
-void Engine::handleKeyPress(Player &player) {
+[[nodiscard]] InputState Engine::handleKeyPress() {
+    InputState inputState;
+    inputState.left = false;
+    inputState.right = false;
+    inputState.up = false;
+    inputState.down = false;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-        player.handleKeyPress(sf::Keyboard::Key::A);
+        inputState.left = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-        player.handleKeyPress(sf::Keyboard::Key::D);
+        inputState.right = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-        player.handleKeyPress(sf::Keyboard::Key::Space);
+        inputState.up = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
-        player.handleKeyPress(sf::Keyboard::Key::Up);
+        inputState.up = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
-        player.handleKeyPress(sf::Keyboard::Key::Down);
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-        player.handleKeyPress(sf::Keyboard::Key::Left);
+        inputState.left = true;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-        player.handleKeyPress(sf::Keyboard::Key::Right);
+        inputState.right = true;
     }
+    return inputState;
 }
 
 void Engine::run() {
@@ -161,8 +168,8 @@ void Engine::run() {
         }
         window.clear();
 
-        player.update();
-        handleKeyPress(player);
+        InputState inputState = handleKeyPress();
+        player.update(inputState);
         handleCollisions(player, platforms);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {

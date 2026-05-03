@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <cstring>
 
 namespace ThePlayer {
 Player::Player(PlayerPhysics physics) : _physics(physics) {
@@ -22,35 +23,8 @@ void Player::fixPosGroundY() {
         {_rect.getPosition().x, _physics.groundY - _rect.getSize().y});
 }
 
-void Player::clearKeys() {
-    _keysPressed.left = false;
-    _keysPressed.right = false;
-    _keysPressed.up = false;
-    _keysPressed.down = false;
-}
-
-//! TODO Somehow try to set all required keys at once
-void handleKeyPress(sf::Keyboard::Key key) {
-    switch (key) {
-    case sf::Keyboard::Key::A:
-    case sf::Keyboard::Key::Left: {
-        _keysPressed.left = true;
-        break;
-    }
-    case sf::Keyboard::Key::D:
-    case sf::Keyboard::Key::Right: {
-        _keysPressed.right = true;
-        break;
-    }
-    case sf::Keyboard::Key::Space:
-    case sf::Keyboard::Key::Up: {
-        _keysPressed.up = true;
-        break;
-    }
-    default: {
-        break;
-    }
-    }
+void Player::setInputState(InputState &inputState) {
+    memcpy(&_inputState, &inputState, sizeof(InputState));
 }
 
 void Player::updateY(float time) {
@@ -58,7 +32,7 @@ void Player::updateY(float time) {
     if (!isGrounded()) {
         _physics.velocity.y += _physics.gravity * time;
     }
-    if (isGrounded() && _keysPressed.up) {
+    if (isGrounded() && _inputState.up) {
         _physics.velocity.y = -_physics.jumpforce;
     }
     float offsetY = _physics.velocity.y * time;
@@ -73,13 +47,12 @@ void Player::updateY(float time) {
     if (_physics.velocity.y > 0 && isGrounded()) {
         _physics.velocity.y = 0;
     }
-
 }
 
 void Player::updateX(float time) {
     bool isMoving = false;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+    if (_inputState.left) {
         _rect.setFillColor(sf::Color::Yellow);
         // player.velocity.x = std::min(player.velocity.x, 0.0f);//helps when
         // suddenly switching from different direction
@@ -89,7 +62,7 @@ void Player::updateX(float time) {
         _physics.velocity.x += -1.0f * _physics.acceleration * time;
         isMoving = true;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+    if (_inputState.right) {
         _rect.setFillColor(sf::Color::Magenta);
         // player.velocity.x = std::max(player.velocity.x, 0.0f);//helps when
         // suddenly switching from different direction
@@ -116,14 +89,14 @@ void Player::updateX(float time) {
     _rect.move({_physics.velocity.x * time, 0});
 }
 
-void Player::update() {
+void Player::update(InputState &inputState) {
+    setInputState(inputState);
     float time = _clock.restart().asSeconds();
     updateY(time);
     updateX(time);
 }
 
 void Player::handleCollision(const sf::RectangleShape &obj) {
-    std::cout << "Handle Collision\n";
     if (_physics.velocity.x > 0) {
         // the object is on the right
         _rect.setPosition(

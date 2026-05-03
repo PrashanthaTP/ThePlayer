@@ -1,5 +1,9 @@
+#pragma once
+
 #include <SFML/Graphics.hpp>
 #include <memory>
+
+#include "inputs.hpp"
 
 namespace ThePlayer {
 struct WorldUtils;
@@ -9,12 +13,6 @@ struct Limits {
     float maxVal;
 };
 
-struct Keys {
-    bool left;
-    bool right;
-    bool up;
-    bool down;
-};
 
 struct PlayerPhysics {
     sf::Vector2f velocity;
@@ -33,21 +31,20 @@ class Player {
     sf::RectangleShape _rect;
     PlayerPhysics _physics;
     sf::Clock _clock;
-    Keys _keysPressed;
+    InputState _inputState;
     // std::unique_ptr<WorldUtils> _utils_p;
     void updateY(float time);
     void updateX(float time);
     bool isGrounded();
     bool isBelowGround();
     void fixPosGroundY();
-    void clearKeys();
+    void setInputState(InputState &inputState);
 
-  public:
+public :
     // Player(PlayerPhysics physics, std::unique_ptr<WorldUtils> _utils_p);
     Player(PlayerPhysics physics);
-    void update();
+    void update(InputState &inputState);
     void handleCollision(const sf::RectangleShape &obj);
-    void handleKeyPress(sf::Keyboard::Key key);
     [[nodiscard]] const sf::RectangleShape &getDrawObj() const;
     [[nodiscard]] const sf::Vector2f getSize() const;
     [[nodiscard]] const sf::Vector2f getPosition() const;

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "player.hpp"
+#include "inputs.hpp"
 
 namespace ThePlayer {
 
@@ -17,7 +18,7 @@ class Engine {
     void handleCollisions(
         Player &player,
         std::vector<std::unique_ptr<const sf::RectangleShape>> &platforms);
-    void handleKeyPress(Player &player);
+    [[nodiscard]] InputState handleKeyPress();
     ~Engine();
 };
 
