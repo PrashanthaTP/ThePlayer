@@ -22,12 +22,43 @@ void Player::fixPosGroundY() {
         {_rect.getPosition().x, _physics.groundY - _rect.getSize().y});
 }
 
+void Player::clearKeys() {
+    _keysPressed.left = false;
+    _keysPressed.right = false;
+    _keysPressed.up = false;
+    _keysPressed.down = false;
+}
+
+//! TODO Somehow try to set all required keys at once
+void handleKeyPress(sf::Keyboard::Key key) {
+    switch (key) {
+    case sf::Keyboard::Key::A:
+    case sf::Keyboard::Key::Left: {
+        _keysPressed.left = true;
+        break;
+    }
+    case sf::Keyboard::Key::D:
+    case sf::Keyboard::Key::Right: {
+        _keysPressed.right = true;
+        break;
+    }
+    case sf::Keyboard::Key::Space:
+    case sf::Keyboard::Key::Up: {
+        _keysPressed.up = true;
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+}
+
 void Player::updateY(float time) {
     // ------------- Apply Physics -------------
     if (!isGrounded()) {
         _physics.velocity.y += _physics.gravity * time;
     }
-    if (isGrounded() && sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
+    if (isGrounded() && _keysPressed.up) {
         _physics.velocity.y = -_physics.jumpforce;
     }
     float offsetY = _physics.velocity.y * time;
@@ -42,7 +73,9 @@ void Player::updateY(float time) {
     if (_physics.velocity.y > 0 && isGrounded()) {
         _physics.velocity.y = 0;
     }
+
 }
+
 void Player::updateX(float time) {
     bool isMoving = false;
 

@@ -9,6 +9,13 @@ struct Limits {
     float maxVal;
 };
 
+struct Keys {
+    bool left;
+    bool right;
+    bool up;
+    bool down;
+};
+
 struct PlayerPhysics {
     sf::Vector2f velocity;
     sf::Vector2f pos;
@@ -26,18 +33,21 @@ class Player {
     sf::RectangleShape _rect;
     PlayerPhysics _physics;
     sf::Clock _clock;
+    Keys _keysPressed;
     // std::unique_ptr<WorldUtils> _utils_p;
     void updateY(float time);
     void updateX(float time);
     bool isGrounded();
     bool isBelowGround();
     void fixPosGroundY();
+    void clearKeys();
 
   public:
     // Player(PlayerPhysics physics, std::unique_ptr<WorldUtils> _utils_p);
     Player(PlayerPhysics physics);
     void update();
     void handleCollision(const sf::RectangleShape &obj);
+    void handleKeyPress(sf::Keyboard::Key key);
     [[nodiscard]] const sf::RectangleShape &getDrawObj() const;
     [[nodiscard]] const sf::Vector2f getSize() const;
     [[nodiscard]] const sf::Vector2f getPosition() const;

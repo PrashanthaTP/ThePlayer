@@ -17,6 +17,7 @@ class Engine {
     void handleCollisions(
         Player &player,
         std::vector<std::unique_ptr<const sf::RectangleShape>> &platforms);
+    void handleKeyPress(Player &player);
     ~Engine();
 };
 

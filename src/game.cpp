@@ -75,6 +75,30 @@ void Engine::handleCollisions(
     }
 }
 
+void Engine::handleKeyPress(Player &player) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+        player.handleKeyPress(sf::Keyboard::Key::A);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+        player.handleKeyPress(sf::Keyboard::Key::D);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
+        player.handleKeyPress(sf::Keyboard::Key::Space);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+        player.handleKeyPress(sf::Keyboard::Key::Up);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+        player.handleKeyPress(sf::Keyboard::Key::Down);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+        player.handleKeyPress(sf::Keyboard::Key::Left);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
+        player.handleKeyPress(sf::Keyboard::Key::Right);
+    }
+}
+
 void Engine::run() {
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
                             GSettings.name);
@@ -138,7 +162,7 @@ void Engine::run() {
         window.clear();
 
         player.update();
-
+        handleKeyPress(player);
         handleCollisions(player, platforms);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
