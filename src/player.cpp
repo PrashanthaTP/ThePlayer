@@ -99,29 +99,61 @@ void Player::update(InputState &inputState) {
 void Player::handleCollision(const sf::RectangleShape &obj,
                              CollisionDirection direction) {
 
-    switch (direction) {
-    case CollisionDirection::FROM_LEFT:
-        // if (_physics.velocity.x > 0) {
-        // the object is on the right
-        {
-            _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
-                               _rect.getPosition().y});
+    // regardless of the direction if the player is above the object,
+    // then player should be able to stand on it ?
+    sf::Vector2f playerPos = _rect.getPosition();
+    sf::Vector2f objPos = obj.getPosition();
+
+    float playerTopY = playerPos.y;
+    float playerBottomY = playerPos.y + _rect.getSize().y;
+    float objTopY = objPos.y;
+
+    bool standingNearLeftEdge = false;
+    bool standingNearRightEdge = false;
+    float overlap = 0;
+    if ((playerPos.x >= objPos.x && playerPos.x < objPos.x + obj.getSize().x)) {
+        standingNearLeftEdge = true;
+        overlap = playerPos.x + _rect.getSize().x - objPos.x;
+    }
+    if ((playerPos.x + _rect.getSize().x > objPos.x &&
+         playerPos.x + _rect.getSize().x <= objPos.x + obj.getSize().x)) {
+        standingNearRightEdge = true;
+        overlap = objPos.x + obj.getSize().x - playerPos.x;
+    }
+    bool isPlayerXInBetweenObjX = standingNearLeftEdge || standingNearRightEdge;
+
+    if (playerTopY < objTopY && isPlayerXInBetweenObjX &&
+        overlap >= _rect.getSize().x / 2) {
+        // no need to change position!?
+        _rect.setPosition(
+            {_rect.getPosition().x, obj.getPosition().y - _rect.getSize().y});
+        _physics.velocity.y =
+            0; // when player is moved from the edge it wont fall immediately
+    } else {
+
+        _physics.velocity.x = 0;
+        switch (direction) {
+        case CollisionDirection::FROM_LEFT:
+            // if (_physics.velocity.x > 0) {
+            // the object is on the right
+            {
+                _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
+                                   _rect.getPosition().y});
+                break;
+            }
+        case CollisionDirection::FROM_RIGHT: {
+            // else if (_physics.velocity.x < 0)
+            //  the object is on the left
+            _rect.setPosition(
+                {obj.getPosition().x + obj.getSize().x, _rect.getPosition().y});
             break;
         }
-    case CollisionDirection::FROM_RIGHT: {
-        // else if (_physics.velocity.x < 0)
-        //  the object is on the left
-        _rect.setPosition(
-            {obj.getPosition().x + obj.getSize().x, _rect.getPosition().y});
-        break;
-    }
 
-    default: {
-        break;
+        default: {
+            break;
+        }
+        }
     }
-    }
-
-    _physics.velocity.x = 0;
 }
 
 [[nodiscard]] const sf::RectangleShape &Player::getDrawObj() const {

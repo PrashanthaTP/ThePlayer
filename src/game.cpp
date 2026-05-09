@@ -204,7 +204,7 @@ void Engine::run() {
         .velocity = {0.0f, 0.0f},
         .pos = {(float)GSettings.width / 2 - 15.0f, GSettings.groundY - 60.0f},
         .size = {30.0f, 60.0f},
-        .jumpforce = 350.0f,
+        .jumpforce = 450.0f,
         .friction = 0.9f,
         .gravity = 800.0f,
         .acceleration = 900.0f,
