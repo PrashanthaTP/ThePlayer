@@ -1,8 +1,8 @@
 #include "player.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace ThePlayer {
 Player::Player(PlayerPhysics physics) : _physics(physics) {
@@ -96,16 +96,31 @@ void Player::update(InputState &inputState) {
     updateX(time);
 }
 
-void Player::handleCollision(const sf::RectangleShape &obj) {
-    if (_physics.velocity.x > 0) {
+void Player::handleCollision(const sf::RectangleShape &obj,
+                             CollisionDirection direction) {
+
+    switch (direction) {
+    case CollisionDirection::FROM_LEFT:
+        // if (_physics.velocity.x > 0) {
         // the object is on the right
-        _rect.setPosition(
-            {obj.getPosition().x - _rect.getSize().x, _rect.getPosition().y});
-    } else if (_physics.velocity.x < 0) {
-        // the object is on the left
+        {
+            _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
+                               _rect.getPosition().y});
+            break;
+        }
+    case CollisionDirection::FROM_RIGHT: {
+        // else if (_physics.velocity.x < 0)
+        //  the object is on the left
         _rect.setPosition(
             {obj.getPosition().x + obj.getSize().x, _rect.getPosition().y});
+        break;
     }
+
+    default: {
+        break;
+    }
+    }
+
     _physics.velocity.x = 0;
 }
 
@@ -120,5 +135,4 @@ void Player::handleCollision(const sf::RectangleShape &obj) {
 [[nodiscard]] const sf::Vector2f Player::getPosition() const {
     return _rect.getPosition();
 };
-
 }; // namespace ThePlayer

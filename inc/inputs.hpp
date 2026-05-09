@@ -6,3 +6,4 @@ struct InputState {
     bool up;
     bool down;
 };
+

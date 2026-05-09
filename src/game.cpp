@@ -44,6 +44,55 @@ Engine::Engine() {}
 
 Engine::~Engine() {}
 
+[[nodiscard]] CollisionDirection
+Engine::findCollisionDirection(Player &player,
+                               const sf::RectangleShape &platform) {
+    const sf::Vector2f size = player.getSize();
+    const sf::Vector2f pos = player.getPosition();
+    float leftX = pos.x;
+    float rightX = pos.x + size.x;
+    float topY = pos.y;
+    float bottomY = pos.y + size.y;
+
+    float pLeftX = platform.getPosition().x;
+    float pRightX = pLeftX + platform.getSize().x;
+    float pTopY = platform.getPosition().y;
+    float pBottomY = pTopY + platform.getSize().y;
+
+    float overlapFromLeftX = rightX - pLeftX;
+    float overlapFromRightX = pRightX - leftX;
+    float overlapFromTopY = bottomY - pTopY;
+    float overlapFromBottomY = pBottomY - topY;
+
+    float res = GSettings.width + 10.0f;
+    CollisionDirection resDir = CollisionDirection::FROM_LEFT;
+    if (overlapFromLeftX && overlapFromLeftX < overlapFromRightX) {
+        if (overlapFromLeftX < res) {
+            resDir = CollisionDirection::FROM_LEFT;
+            res = overlapFromLeftX;
+        }
+    }
+    if (overlapFromRightX && overlapFromRightX < overlapFromLeftX) {
+        if (overlapFromRightX < res) {
+            resDir = CollisionDirection::FROM_RIGHT;
+            res = overlapFromRightX;
+        }
+    }
+    if (overlapFromTopY && overlapFromTopY < overlapFromBottomY) {
+        if (overlapFromTopY < res) {
+            resDir = CollisionDirection::FROM_TOP;
+            res = overlapFromTopY;
+        }
+    }
+    if (overlapFromBottomY && overlapFromBottomY < overlapFromTopY) {
+        if (overlapFromBottomY < res) {
+            resDir = CollisionDirection::FROM_BOTTOM;
+            res = overlapFromBottomY;
+        }
+    }
+    return resDir;
+}
+
 void Engine::handleCollisions(
     Player &player,
     std::vector<std::unique_ptr<const sf::RectangleShape>> &platforms) {
@@ -57,6 +106,7 @@ void Engine::handleCollisions(
         if (!platform_p) {
             continue;
         }
+
         auto platform = *platform_p;
         float pLeftX = platform.getPosition().x;
         float pRightX = pLeftX + platform.getSize().x;
@@ -71,7 +121,9 @@ void Engine::handleCollisions(
         bool xColliding = rightX >= pLeftX && leftX <= pRightX;
         bool yColliding = topY <= pBottomY && bottomY >= pTopY;
         if (xColliding && yColliding) {
-            player.handleCollision(platform);
+            CollisionDirection direction =
+                findCollisionDirection(player, platform);
+            player.handleCollision(platform, direction);
         }
     }
 }

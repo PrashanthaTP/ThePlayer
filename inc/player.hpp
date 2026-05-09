@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "inputs.hpp"
+#include "collisions.hpp"
 
 namespace ThePlayer {
 struct WorldUtils;
@@ -44,7 +45,7 @@ public :
     // Player(PlayerPhysics physics, std::unique_ptr<WorldUtils> _utils_p);
     Player(PlayerPhysics physics);
     void update(InputState &inputState);
-    void handleCollision(const sf::RectangleShape &obj);
+    void handleCollision(const sf::RectangleShape &obj, CollisionDirection direction);
     [[nodiscard]] const sf::RectangleShape &getDrawObj() const;
     [[nodiscard]] const sf::Vector2f getSize() const;
     [[nodiscard]] const sf::Vector2f getPosition() const;
