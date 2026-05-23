@@ -96,6 +96,11 @@ void Player::update(InputState &inputState) {
     updateX(time);
 }
 
+void Player::handleGroundCollision() {
+    // Should velocity.y be updated?
+    fixPosGroundY();
+}
+
 void Player::handleCollision(const sf::RectangleShape &obj,
                              CollisionDirection direction) {
 

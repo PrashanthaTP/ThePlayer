@@ -126,6 +126,9 @@ void Engine::handleCollisions(
             player.handleCollision(platform, direction);
         }
     }
+    if(bottomY >= GSettings.groundY){
+        player.handleGroundCollision();
+    }
 }
 
 [[nodiscard]] InputState Engine::handleKeyPress() {
