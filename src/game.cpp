@@ -3,31 +3,9 @@
 #include <vector>
 
 #include "game.hpp"
+#include "constants.hpp"
 
 namespace ThePlayer {
-
-struct GameSettings {
-    std::string name;
-    unsigned width;
-    unsigned height;
-
-    float groundY;
-};
-
-struct Colors {
-    sf::Color up = sf::Color::Cyan;
-    sf::Color down = sf::Color::Green;
-    sf::Color left = sf::Color::Red;
-    sf::Color right = sf::Color::Yellow;
-    sf::Color idle = sf::Color::White;
-};
-
-const GameSettings GSettings = {.name = "ThePlayer",
-                                .width = 640,
-                                .height = 640,
-                                .groundY = 320.0f + 40 + 20};
-
-Colors GColors;
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -126,7 +104,7 @@ void Engine::handleCollisions(
             player.handleCollision(platform, direction);
         }
     }
-    if(bottomY >= GSettings.groundY){
+    if (bottomY >= GSettings.groundY) {
         player.handleGroundCollision();
     }
 }
