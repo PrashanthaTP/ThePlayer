@@ -15,7 +15,7 @@ class Engine {
   private:
     void handleCollisions(
         Player &player,
-        std::vector<std::unique_ptr<const sf::RectangleShape>> &platforms);
+        std::vector<std::shared_ptr<const sf::RectangleShape>> &platforms);
     [[nodiscard]] InputState handleKeyPress();
     [[nodiscard]] CollisionDirection
     findCollisionDirection(Player &player, const sf::RectangleShape &platform);

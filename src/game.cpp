@@ -2,10 +2,37 @@
 #include <memory>
 #include <vector>
 
-#include "game.hpp"
 #include "constants.hpp"
+#include "game.hpp"
+#include "platforms.hpp"
 
 namespace ThePlayer {
+
+void managePlatforms(sf::RenderWindow &window, float time,
+    std::vector<std::shared_ptr<const sf::RectangleShape>> &platformShapes) {
+    static std::vector<Platform> platforms;
+    if (platforms.empty()) {
+
+        for (const auto &p : platformShapes) {
+            auto size = p->getSize();
+            auto pos = p->getPosition();
+            std::cout << "Window size: " << window.getSize().x << " | " << window.getSize().y << "\n";
+                 
+            platforms.emplace_back(Platform( {(float)window.getSize().x,GSettings.groundY-size.y}, size, {50.0f, 50.0f}));
+            platforms.back().draw(window);
+        }
+        return;
+    }
+
+    for(auto &p: platforms){
+        std::cout << time << "\n";
+        p.moveLeft(time);
+        p.draw(window);
+        //std::cout << "Drawing platform\n";
+        std::cout <<  "Position: " << p.getPosition().x << " | " << p.getPosition().y << "\n";
+    }
+
+}
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -18,9 +45,11 @@ sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
     return resRect;
 }
 
-Engine::Engine() {}
+Engine::Engine() {
+}
 
-Engine::~Engine() {}
+Engine::~Engine() {
+}
 
 [[nodiscard]] CollisionDirection
 Engine::findCollisionDirection(Player &player,
@@ -73,7 +102,7 @@ Engine::findCollisionDirection(Player &player,
 
 void Engine::handleCollisions(
     Player &player,
-    std::vector<std::unique_ptr<const sf::RectangleShape>> &platforms) {
+    std::vector<std::shared_ptr<const sf::RectangleShape>> &platforms) {
     const sf::Vector2f size = player.getSize();
     const sf::Vector2f pos = player.getPosition();
     float leftX = pos.x;
@@ -141,8 +170,8 @@ void Engine::handleCollisions(
 
 void Engine::run() {
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
-                            GSettings.name);
-    window.setFramerateLimit(60);
+                            GSettings.name, sf::Style::Titlebar | sf::Style::Close);
+    window.setFramerateLimit(30);
 
     sf::RectangleShape groundLine({GSettings.width * 1.0f, 2});
     groundLine.setFillColor(sf::Color::Red);
@@ -173,12 +202,13 @@ void Engine::run() {
     sf::RectangleShape boundingBox1 = addBoundingBox(window, treeSprite1);
     sf::RectangleShape boundingBox2 = addBoundingBox(window, treeSprite2);
 
-    std::vector<std::unique_ptr<const sf::RectangleShape>> platforms;
+    std::vector<std::shared_ptr<const sf::RectangleShape>> platforms;
 
     platforms.emplace_back(
-        std::make_unique<const sf::RectangleShape>(boundingBox1));
+        std::make_shared<const sf::RectangleShape>(boundingBox1));
     platforms.emplace_back(
-        std::make_unique<const sf::RectangleShape>(boundingBox2));
+        std::make_shared<const sf::RectangleShape>(boundingBox2));
+
     sf::Clock clock;
 
     PlayerPhysics physics = {
@@ -217,6 +247,7 @@ void Engine::run() {
         window.draw(player.getDrawObj());
         window.draw(groundLine);
         window.display();
+        managePlatforms(window, clock.restart().asSeconds(), platforms);
     }
 }
 
