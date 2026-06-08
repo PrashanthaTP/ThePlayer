@@ -3,10 +3,10 @@
 Platform::Platform(const sf::Vector2f pos,
                    const sf::Vector2f size,
                    const sf::Vector2f acc)
-    : _size(size),
-      _pos(pos),
+    : _pos(pos),
+      _size(size),
       _acc(acc),
-      _rect(sf::RectangleShape(size)) {
+      _rect(size) {
     _rect.setOutlineColor(sf::Color::Red);
     _rect.setFillColor(sf::Color::Blue);
     _rect.setOutlineThickness(2.0f);
@@ -33,7 +33,20 @@ void Platform::draw(sf::RenderWindow &window) {
     window.draw(_rect);
 }
 
-sf::Vector2f Platform::getPosition(){
-      return _rect.getPosition(); 
+sf::Vector2f Platform::getSize() {
+    return _rect.getSize();
 }
 
+sf::Vector2f Platform::getPosition() {
+    return _rect.getPosition();
+}
+
+void Platform::setPosition(sf::Vector2f pos) {
+    _rect.setPosition(pos);
+}
+
+#if DEBUG
+sf::RectangleShape &Platform::getRect() {
+    return _rect;
+}
+#endif

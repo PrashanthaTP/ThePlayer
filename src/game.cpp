@@ -8,28 +8,44 @@
 
 namespace ThePlayer {
 
+#if DEBUG
+const Platform& managePlatforms(sf::RenderWindow &window, float time,
+#else
 void managePlatforms(sf::RenderWindow &window, float time,
+#endif
     std::vector<std::shared_ptr<const sf::RectangleShape>> &platformShapes) {
     static std::vector<Platform> platforms;
+    float offset = 0;
     if (platforms.empty()) {
 
         for (const auto &p : platformShapes) {
             auto size = p->getSize();
             auto pos = p->getPosition();
-            std::cout << "Window size: " << window.getSize().x << " | " << window.getSize().y << "\n";
                  
-            platforms.emplace_back(Platform( {(float)window.getSize().x,GSettings.groundY-size.y}, size, {50.0f, 50.0f}));
+            platforms.emplace_back(Platform( {(float)window.getSize().x + offset,GSettings.groundY-size.y}, size, {800.0f, 200.0f}));
+
             platforms.back().draw(window);
+
+            offset += size.x * 3;
         }
-        return;
+    
+    }
+    #if DEBUG
+    for(auto &p: platforms){
+        ///std::cout << p.getSize().x << " | " << p.getSize().y << "\n";
+        //p.setPosition({300.0f, 150.0f});
+        p.draw(window);
     }
 
+    #endif
+
+     
     for(auto &p: platforms){
-        std::cout << time << "\n";
+        //std::cout << time << "\n";
         p.moveLeft(time);
         p.draw(window);
         //std::cout << "Drawing platform\n";
-        std::cout <<  "Position: " << p.getPosition().x << " | " << p.getPosition().y << "\n";
+        //std::cout <<  "Position: " << p.getPosition().x << " | " << p.getPosition().y << "\n";
     }
 
 }
@@ -240,14 +256,19 @@ void Engine::run() {
         }
 
         window.draw(bgSprite);
-        window.draw(treeSprite1);
-        window.draw(treeSprite2);
+
+        //window.draw(treeSprite1);
+        //window.draw(treeSprite2);
         window.draw(boundingBox1);
         window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
-        window.display();
         managePlatforms(window, clock.restart().asSeconds(), platforms);
+
+        //std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
+        //std::cout  << p.getPosition().x << " | " << p.getPosition().y << "\n";
+        //window.draw(p.getRect());
+        window.display();
     }
 }
 
