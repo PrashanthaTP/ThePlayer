@@ -101,7 +101,7 @@ void Player::handleGroundCollision() {
     fixPosGroundY();
 }
 
-void Player::handleCollision(const sf::RectangleShape &obj,
+void Player::handleCollision(const Platform &obj,
                              CollisionDirection direction) {
 
     // regardless of the direction if the player is above the object,

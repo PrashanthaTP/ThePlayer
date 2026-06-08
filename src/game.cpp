@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -8,46 +9,50 @@
 
 namespace ThePlayer {
 
-#if DEBUG
-const Platform& managePlatforms(sf::RenderWindow &window, float time,
-#else
-void managePlatforms(sf::RenderWindow &window, float time,
-#endif
+static std::vector<Platform> platforms;
+
+void managePlatforms(
+    sf::RenderWindow &window,
+    float time,
     std::vector<std::shared_ptr<const sf::RectangleShape>> &platformShapes) {
-    static std::vector<Platform> platforms;
-    float offset = 0;
+
     if (platforms.empty()) {
+        float offset = 0;
 
         for (const auto &p : platformShapes) {
-            auto size = p->getSize();
-            auto pos = p->getPosition();
-                 
-            platforms.emplace_back(Platform( {(float)window.getSize().x + offset,GSettings.groundY-size.y}, size, {800.0f, 200.0f}));
+            auto const size = p->getSize();
+            auto const pos = p->getPosition();
+
+            const sf::Vector2f newPos = {(float)window.getSize().x + offset,
+                                             GSettings.groundY - size.y};
+            const sf::Vector2f acc = {1500.0f, 500.0f};
+            platforms.emplace_back(newPos, size, acc);
 
             platforms.back().draw(window);
 
             offset += size.x * 3;
         }
-    
     }
-    #if DEBUG
-    for(auto &p: platforms){
-        ///std::cout << p.getSize().x << " | " << p.getSize().y << "\n";
-        //p.setPosition({300.0f, 150.0f});
+#if DEBUG
+    for (auto &p : platforms) {
+        /// std::cout << p.getSize().x << " | " << p.getSize().y << "\n";
+        // p.setPosition({300.0f, 150.0f});
         p.draw(window);
     }
 
-    #endif
+#endif
 
-     
-    for(auto &p: platforms){
-        //std::cout << time << "\n";
+    for (auto &p : platforms) {
+        // std::cout << time << "\n";
         p.moveLeft(time);
+        // std::cout << "Drawing platform\n";
+        // std::cout <<  "Position: " << p.getPosition().x << " | " <<
+        // p.getPosition().y << "\n";
+        if (p.getPosition().x + p.getSize().x < 0) {
+            p.setPosition({(float)window.getSize().x, GSettings.groundY-p.getSize().y});
+        }
         p.draw(window);
-        //std::cout << "Drawing platform\n";
-        //std::cout <<  "Position: " << p.getPosition().x << " | " << p.getPosition().y << "\n";
     }
-
 }
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
@@ -68,8 +73,12 @@ Engine::~Engine() {
 }
 
 [[nodiscard]] CollisionDirection
+#if DEBUG
 Engine::findCollisionDirection(Player &player,
                                const sf::RectangleShape &platform) {
+#else
+Engine::findCollisionDirection(const Player &player, const Platform &platform) {
+#endif
     const sf::Vector2f size = player.getSize();
     const sf::Vector2f pos = player.getPosition();
     float leftX = pos.x;
@@ -116,6 +125,7 @@ Engine::findCollisionDirection(Player &player,
     return resDir;
 }
 
+#if DEBUG
 void Engine::handleCollisions(
     Player &player,
     std::vector<std::shared_ptr<const sf::RectangleShape>> &platforms) {
@@ -131,6 +141,39 @@ void Engine::handleCollisions(
         }
 
         auto platform = *platform_p;
+        float pLeftX = platform.getPosition().x;
+        float pRightX = pLeftX + platform.getSize().x;
+        float pTopY = platform.getPosition().y;
+        float pBottomY = pTopY + platform.getSize().y;
+#ifdef DEBUG
+        std::cout << leftX << " | " << rightX << " | " << topY << " | "
+                  << bottomY << "\n";
+        std::cout << pLeftX << " | " << pRightX << " | " << pTopY << " | "
+                  << pBottomY << "\n";
+#endif
+        bool xColliding = rightX >= pLeftX && leftX <= pRightX;
+        bool yColliding = topY <= pBottomY && bottomY >= pTopY;
+        if (xColliding && yColliding) {
+            CollisionDirection direction =
+                findCollisionDirection(player, platform);
+            player.handleCollision(platform, direction);
+        }
+    }
+    if (bottomY >= GSettings.groundY) {
+        player.handleGroundCollision();
+    }
+}
+#endif
+
+void Engine::handleCollisions(Player &player) {
+    const sf::Vector2f size = player.getSize();
+    const sf::Vector2f pos = player.getPosition();
+    float leftX = pos.x;
+    float rightX = pos.x + size.x;
+    float topY = pos.y;
+    float bottomY = pos.y + size.y;
+    for (auto &platform : platforms) {
+
         float pLeftX = platform.getPosition().x;
         float pRightX = pLeftX + platform.getSize().x;
         float pTopY = platform.getPosition().y;
@@ -186,7 +229,8 @@ void Engine::handleCollisions(
 
 void Engine::run() {
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
-                            GSettings.name, sf::Style::Titlebar | sf::Style::Close);
+                            GSettings.name,
+                            sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(30);
 
     sf::RectangleShape groundLine({GSettings.width * 1.0f, 2});
@@ -249,7 +293,7 @@ void Engine::run() {
 
         InputState inputState = handleKeyPress();
         player.update(inputState);
-        handleCollisions(player, platforms);
+        handleCollisions(player);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
@@ -257,17 +301,17 @@ void Engine::run() {
 
         window.draw(bgSprite);
 
-        //window.draw(treeSprite1);
-        //window.draw(treeSprite2);
-        window.draw(boundingBox1);
-        window.draw(boundingBox2);
+        // window.draw(treeSprite1);
+        // window.draw(treeSprite2);
+        // window.draw(boundingBox1);
+        // window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
         managePlatforms(window, clock.restart().asSeconds(), platforms);
 
-        //std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
-        //std::cout  << p.getPosition().x << " | " << p.getPosition().y << "\n";
-        //window.draw(p.getRect());
+        // std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
+        // std::cout  << p.getPosition().x << " | " << p.getPosition().y <<
+        // "\n"; window.draw(p.getRect());
         window.display();
     }
 }

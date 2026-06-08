@@ -33,11 +33,11 @@ void Platform::draw(sf::RenderWindow &window) {
     window.draw(_rect);
 }
 
-sf::Vector2f Platform::getSize() {
+sf::Vector2f Platform::getSize() const{
     return _rect.getSize();
 }
 
-sf::Vector2f Platform::getPosition() {
+sf::Vector2f Platform::getPosition() const{
     return _rect.getPosition();
 }
 
