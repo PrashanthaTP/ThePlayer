@@ -51,7 +51,6 @@ void managePlatforms(
         if (p.getPosition().x + p.getSize().x < 0) {
             p.setPosition({(float)window.getSize().x, GSettings.groundY-p.getSize().y});
         }
-        p.draw(window);
     }
 }
 
@@ -262,11 +261,11 @@ void Engine::run() {
     sf::RectangleShape boundingBox1 = addBoundingBox(window, treeSprite1);
     sf::RectangleShape boundingBox2 = addBoundingBox(window, treeSprite2);
 
-    std::vector<std::shared_ptr<const sf::RectangleShape>> platforms;
+    std::vector<std::shared_ptr<const sf::RectangleShape>> platformsPtrs;
 
-    platforms.emplace_back(
+    platformsPtrs.emplace_back(
         std::make_shared<const sf::RectangleShape>(boundingBox1));
-    platforms.emplace_back(
+    platformsPtrs.emplace_back(
         std::make_shared<const sf::RectangleShape>(boundingBox2));
 
     sf::Clock clock;
@@ -291,6 +290,7 @@ void Engine::run() {
         }
         window.clear();
 
+        managePlatforms(window, clock.restart().asSeconds(), platformsPtrs);
         InputState inputState = handleKeyPress();
         player.update(inputState);
         handleCollisions(player);
@@ -307,7 +307,9 @@ void Engine::run() {
         // window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
-        managePlatforms(window, clock.restart().asSeconds(), platforms);
+        for(auto &p : platforms){
+            p.draw(window);
+        }
 
         // std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
         // std::cout  << p.getPosition().x << " | " << p.getPosition().y <<

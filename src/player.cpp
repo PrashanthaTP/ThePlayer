@@ -5,7 +5,8 @@
 #include <iostream>
 
 namespace ThePlayer {
-Player::Player(PlayerPhysics physics) : _physics(physics) {
+Player::Player(PlayerPhysics physics)
+    : _physics(physics) {
     _rect = sf::RectangleShape(_physics.size);
     _rect.setPosition(_physics.pos);
 }
@@ -107,36 +108,72 @@ void Player::handleCollision(const Platform &obj,
     // regardless of the direction if the player is above the object,
     // then player should be able to stand on it ?
     sf::Vector2f playerPos = _rect.getPosition();
+    sf::Vector2f playerSize = _rect.getSize();
+
     sf::Vector2f objPos = obj.getPosition();
+    sf::Vector2f objSize = obj.getSize();
 
     float playerTopY = playerPos.y;
     float playerBottomY = playerPos.y + _rect.getSize().y;
     float objTopY = objPos.y;
 
+    // UNUSED ? 
     bool standingNearLeftEdge = false;
     bool standingNearRightEdge = false;
     float overlap = 0;
-    if ((playerPos.x >= objPos.x && playerPos.x < objPos.x + obj.getSize().x)) {
+    // TODO!! : Rethink about this logic
+    if (playerPos.x < objPos.x && playerPos.x + playerSize.x > objPos.x) {
         standingNearLeftEdge = true;
-        overlap = playerPos.x + _rect.getSize().x - objPos.x;
-    }
-    if ((playerPos.x + _rect.getSize().x > objPos.x &&
-         playerPos.x + _rect.getSize().x <= objPos.x + obj.getSize().x)) {
+
+        /*
+         *
+         *   pPos.x           pPos.x + pSize.x
+         *    ------------------
+         *    \                \
+         *    \                \                  objPos.x + objSize.x
+         *    \----------------\--------------------
+         *          \                              \
+         *
+         */
+        // overlap = playerPos.x + playerSize.x - objPos.x;
+        overlap =
+            objSize.x - (objPos.x + objSize.x - (playerPos.x + playerSize.x));
+    } else if (playerPos.x + playerSize.x > objPos.x + objSize.x &&
+               playerPos.x < objPos.x + objSize.x) {
         standingNearRightEdge = true;
-        overlap = objPos.x + obj.getSize().x - playerPos.x;
+        overlap = objSize.x - (playerPos.x - objPos.x);
+    } else if (playerPos.x > objPos.x 
+              && playerPos.x + playerSize.x < objPos.x + objSize.x){
+        //full overlap
+        overlap = playerSize.x;
     }
+    // UNUSED ?
     bool isPlayerXInBetweenObjX = standingNearLeftEdge || standingNearRightEdge;
 
-    if (playerTopY < objTopY && isPlayerXInBetweenObjX &&
-        overlap >= _rect.getSize().x / 2) {
+    // if (playerTopY < objTopY && isPlayerXInBetweenObjX &&
+    if (overlap >= _rect.getSize().x / 2) { // place on top of platform
         // no need to change position!?
         _rect.setPosition(
             {_rect.getPosition().x, obj.getPosition().y - _rect.getSize().y});
-        _physics.velocity.y =
-            0; // when player is moved from the edge it wont fall immediately
+        // when player is moved from the edge it wont fall immediately
+        // otherwise this downward velocity keep buildling
+        _physics.velocity.y = 0;
+        std::cout << "last move dist: " << obj.getLastMoveDist().x << " | " << obj.getLastMoveDist().y
+                  << "\n";
+        std::cout << "x velocity: "  << _physics.velocity.x << "\n";
+        std::cout << "Overlap: " << overlap << "\n";
+        #if 1
+        // move along with platform if the player is still or moving in the opposite direction of the platform
+        sf::Vector2f distCoveredByPlatform = obj.getLastMoveDist();
+        if((distCoveredByPlatform.x < 0 && _physics.velocity.x >= 0 /*&& _physics.velocity.y == 0*/)
+          ||(distCoveredByPlatform.x > 0 && _physics.velocity.x <= 0)) {
+            _rect.move(distCoveredByPlatform);
+        }
+        #endif
     } else {
 
         _physics.velocity.x = 0;
+        std::cout << "NO OVERLAP\n";
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
             // if (_physics.velocity.x > 0) {

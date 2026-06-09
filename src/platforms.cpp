@@ -6,6 +6,7 @@ Platform::Platform(const sf::Vector2f pos,
     : _pos(pos),
       _size(size),
       _acc(acc),
+      _lastMoveDist({0.0f, 0.0f}),
       _rect(size) {
     _rect.setOutlineColor(sf::Color::Red);
     _rect.setFillColor(sf::Color::Blue);
@@ -18,11 +19,15 @@ void Platform::moveToOrigPos() {
 }
 
 void Platform::moveLeft(float time) {
-    _rect.move({-1 * _acc.x * time * time, 0.0f});
+    sf::Vector2f dist{-1 * _acc.x * time * time, 0.0f};
+    _rect.move(dist);
+    _lastMoveDist = dist;
 }
 
 void Platform::moveRight(float time) {
-    _rect.move({0.0f, _acc.x * time * time});
+    sf::Vector2f dist{0.0f, _acc.x * time * time};
+    _rect.move(dist);
+    _lastMoveDist = dist;
 }
 
 void Platform::respawn() {
@@ -39,6 +44,10 @@ sf::Vector2f Platform::getSize() const{
 
 sf::Vector2f Platform::getPosition() const{
     return _rect.getPosition();
+}
+
+sf::Vector2f Platform::getLastMoveDist() const{
+    return _lastMoveDist;
 }
 
 void Platform::setPosition(sf::Vector2f pos) {
