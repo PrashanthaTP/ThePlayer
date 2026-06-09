@@ -11,8 +11,12 @@ Player::Player(PlayerPhysics physics)
     _rect.setPosition(_physics.pos);
 }
 
+void Player::setGroundSupport(bool state) {
+    _hasGroundSupport = state;
+}
+
 bool Player::isGrounded() {
-    return _rect.getPosition().y + _rect.getSize().y == _physics.groundY;
+    return _rect.getPosition().y + _rect.getSize().y == _physics.groundY || _hasGroundSupport;
 }
 
 bool Player::isBelowGround() {
@@ -35,6 +39,7 @@ void Player::updateY(float time) {
     }
     if (isGrounded() && _inputState.up) {
         _physics.velocity.y = -_physics.jumpforce;
+        setGroundSupport(false);//jumped so not on ground now
     }
     float offsetY = _physics.velocity.y * time;
 
@@ -157,6 +162,7 @@ void Player::handleCollision(const Platform &obj,
             {_rect.getPosition().x, obj.getPosition().y - _rect.getSize().y});
         // when player is moved from the edge it wont fall immediately
         // otherwise this downward velocity keep buildling
+        setGroundSupport(true);
         _physics.velocity.y = 0;
         std::cout << "last move dist: " << obj.getLastMoveDist().x << " | " << obj.getLastMoveDist().y
                   << "\n";
@@ -171,9 +177,8 @@ void Player::handleCollision(const Platform &obj,
         }
         #endif
     } else {
-
+        setGroundSupport(false);
         _physics.velocity.x = 0;
-        std::cout << "NO OVERLAP\n";
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
             // if (_physics.velocity.x > 0) {

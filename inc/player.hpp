@@ -34,6 +34,7 @@ class Player {
     PlayerPhysics _physics;
     sf::Clock _clock;
     InputState _inputState;
+    bool _hasGroundSupport{false};
     // std::unique_ptr<WorldUtils> _utils_p;
     void updateY(float time);
     void updateX(float time);
@@ -41,6 +42,7 @@ class Player {
     bool isBelowGround();
     void fixPosGroundY();
     void setInputState(InputState &inputState);
+    void setGroundSupport(bool state);
 
 public :
     // Player(PlayerPhysics physics, std::unique_ptr<WorldUtils> _utils_p);
