@@ -181,15 +181,14 @@ void Player::handleCollision(const Platform &obj,
         _physics.velocity.x = 0;
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
-            // if (_physics.velocity.x > 0) {
+             if (_physics.velocity.x >= 0) {
             // the object is on the right
-            {
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
                 break;
             }
-        case CollisionDirection::FROM_RIGHT: {
-            // else if (_physics.velocity.x < 0)
+        case CollisionDirection::FROM_RIGHT: 
+             if (_physics.velocity.x <= 0)  {
             //  the object is on the left
             _rect.setPosition(
                 {obj.getPosition().x + obj.getSize().x, _rect.getPosition().y});
