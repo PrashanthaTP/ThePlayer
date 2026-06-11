@@ -38,15 +38,15 @@ void Platform::draw(sf::RenderWindow &window) {
     window.draw(_rect);
 }
 
-sf::Vector2f Platform::getSize() const{
+sf::Vector2f Platform::getSize() const {
     return _rect.getSize();
 }
 
-sf::Vector2f Platform::getPosition() const{
+sf::Vector2f Platform::getPosition() const {
     return _rect.getPosition();
 }
 
-sf::Vector2f Platform::getLastMoveDist() const{
+sf::Vector2f Platform::getLastMoveDist() const {
     return _lastMoveDist;
 }
 

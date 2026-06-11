@@ -16,7 +16,8 @@ void Player::setGroundSupport(bool state) {
 }
 
 bool Player::isGrounded() {
-    return _rect.getPosition().y + _rect.getSize().y == _physics.groundY || _hasGroundSupport;
+    return _rect.getPosition().y + _rect.getSize().y == _physics.groundY ||
+           _hasGroundSupport;
 }
 
 bool Player::isBelowGround() {
@@ -39,7 +40,7 @@ void Player::updateY(float time) {
     }
     if (isGrounded() && _inputState.up) {
         _physics.velocity.y = -_physics.jumpforce;
-        setGroundSupport(false);//jumped so not on ground now
+        setGroundSupport(false); // jumped so not on ground now
     }
     float offsetY = _physics.velocity.y * time;
 
@@ -122,7 +123,7 @@ void Player::handleCollision(const Platform &obj,
     float playerBottomY = playerPos.y + _rect.getSize().y;
     float objTopY = objPos.y;
 
-    // UNUSED ? 
+    // UNUSED ?
     bool standingNearLeftEdge = false;
     bool standingNearRightEdge = false;
     float overlap = 0;
@@ -147,9 +148,9 @@ void Player::handleCollision(const Platform &obj,
                playerPos.x < objPos.x + objSize.x) {
         standingNearRightEdge = true;
         overlap = objSize.x - (playerPos.x - objPos.x);
-    } else if (playerPos.x > objPos.x 
-              && playerPos.x + playerSize.x < objPos.x + objSize.x){
-        //full overlap
+    } else if (playerPos.x > objPos.x &&
+               playerPos.x + playerSize.x < objPos.x + objSize.x) {
+        // full overlap
         overlap = playerSize.x;
     }
     // UNUSED ?
@@ -164,36 +165,38 @@ void Player::handleCollision(const Platform &obj,
         // otherwise this downward velocity keep buildling
         setGroundSupport(true);
         _physics.velocity.y = 0;
-        std::cout << "last move dist: " << obj.getLastMoveDist().x << " | " << obj.getLastMoveDist().y
-                  << "\n";
-        std::cout << "x velocity: "  << _physics.velocity.x << "\n";
+        std::cout << "last move dist: " << obj.getLastMoveDist().x << " | "
+                  << obj.getLastMoveDist().y << "\n";
+        std::cout << "x velocity: " << _physics.velocity.x << "\n";
         std::cout << "Overlap: " << overlap << "\n";
-        #if 1
-        // move along with platform if the player is still or moving in the opposite direction of the platform
+#if 1
+        // move along with platform if the player is still or moving in the
+        // opposite direction of the platform
         sf::Vector2f distCoveredByPlatform = obj.getLastMoveDist();
-        if((distCoveredByPlatform.x < 0 && _physics.velocity.x >= 0 /*&& _physics.velocity.y == 0*/)
-          ||(distCoveredByPlatform.x > 0 && _physics.velocity.x <= 0)) {
+        if ((distCoveredByPlatform.x < 0 &&
+             _physics.velocity.x >= 0 /*&& _physics.velocity.y == 0*/) ||
+            (distCoveredByPlatform.x > 0 && _physics.velocity.x <= 0)) {
             _rect.move(distCoveredByPlatform);
         }
-        #endif
+#endif
     } else {
         setGroundSupport(false);
         _physics.velocity.x = 0;
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
-             if (_physics.velocity.x >= 0) {
-            // the object is on the right
+            if (_physics.velocity.x >= 0) {
+                // the object is on the right
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
                 break;
             }
-        case CollisionDirection::FROM_RIGHT: 
-             if (_physics.velocity.x <= 0)  {
-            //  the object is on the left
-            _rect.setPosition(
-                {obj.getPosition().x + obj.getSize().x, _rect.getPosition().y});
-            break;
-        }
+        case CollisionDirection::FROM_RIGHT:
+            if (_physics.velocity.x <= 0) {
+                //  the object is on the left
+                _rect.setPosition({obj.getPosition().x + obj.getSize().x,
+                                   _rect.getPosition().y});
+                break;
+            }
 
         default: {
             break;

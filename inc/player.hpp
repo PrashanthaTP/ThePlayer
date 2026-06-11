@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-#include "inputs.hpp"
 #include "collisions.hpp"
+#include "inputs.hpp"
 #include "platforms.hpp"
 
 namespace ThePlayer {
@@ -14,7 +14,6 @@ struct Limits {
     float minVal;
     float maxVal;
 };
-
 
 struct PlayerPhysics {
     sf::Vector2f velocity;
@@ -44,13 +43,12 @@ class Player {
     void setInputState(InputState &inputState);
     void setGroundSupport(bool state);
 
-public :
+  public:
     // Player(PlayerPhysics physics, std::unique_ptr<WorldUtils> _utils_p);
     Player(PlayerPhysics physics);
     void update(InputState &inputState);
     void handleGroundCollision(void);
-    void handleCollision(const Platform &obj,
-                         CollisionDirection direction);
+    void handleCollision(const Platform &obj, CollisionDirection direction);
     [[nodiscard]] const sf::RectangleShape &getDrawObj() const;
     [[nodiscard]] const sf::Vector2f getSize() const;
     [[nodiscard]] const sf::Vector2f getPosition() const;

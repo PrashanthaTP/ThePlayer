@@ -24,8 +24,8 @@ void managePlatforms(
             auto const pos = p->getPosition();
 
             const sf::Vector2f newPos = {(float)window.getSize().x + offset,
-                                             GSettings.groundY - size.y};
-            const sf::Vector2f acc = {1500.0f, 500.0f};
+                                         GSettings.groundY - size.y};
+            const sf::Vector2f acc = {1000.0f, 500.0f};
             platforms.emplace_back(newPos, size, acc);
 
             platforms.back().draw(window);
@@ -49,7 +49,8 @@ void managePlatforms(
         // std::cout <<  "Position: " << p.getPosition().x << " | " <<
         // p.getPosition().y << "\n";
         if (p.getPosition().x + p.getSize().x < 0) {
-            p.setPosition({(float)window.getSize().x, GSettings.groundY-p.getSize().y});
+            p.setPosition(
+                {(float)window.getSize().x, GSettings.groundY - p.getSize().y});
         }
     }
 }
@@ -307,7 +308,7 @@ void Engine::run() {
         // window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
-        for(auto &p : platforms){
+        for (auto &p : platforms) {
             p.draw(window);
         }
 
