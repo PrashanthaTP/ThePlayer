@@ -168,7 +168,7 @@ void Player::handleCollision(const Platform &obj,
         std::cout << "last move dist: " << obj.getLastMoveDist().x << " | "
                   << obj.getLastMoveDist().y << "\n";
         std::cout << "x velocity: " << _physics.velocity.x << "\n";
-        std::cout << "Overlap: " << overlap << "\n";
+        std::cout << "Overlap: " << overlap << " / " << _rect.getSize().x  << "\n";
 #if 1
         // move along with platform if the player is still or moving in the
         // opposite direction of the platform
@@ -184,14 +184,16 @@ void Player::handleCollision(const Platform &obj,
         _physics.velocity.x = 0;
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
-            if (_physics.velocity.x >= 0) {
+            if (_physics.velocity.x >= 0)  //without this check the player just 'snaps' to wall once hit when walls are also moving left
+                {
                 // the object is on the right
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
                 break;
             }
         case CollisionDirection::FROM_RIGHT:
-            if (_physics.velocity.x <= 0) {
+            if (_physics.velocity.x <= 0) 
+                {
                 //  the object is on the left
                 _rect.setPosition({obj.getPosition().x + obj.getSize().x,
                                    _rect.getPosition().y});
