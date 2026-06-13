@@ -6,53 +6,58 @@
 #include "constants.hpp"
 #include "game.hpp"
 #include "platforms.hpp"
+#include "rng.hpp"
 
 namespace ThePlayer {
 
 static std::vector<Platform> platforms;
 
-void managePlatforms(
-    sf::RenderWindow &window,
-    float time,
-    std::vector<std::shared_ptr<const sf::RectangleShape>> &platformShapes) {
+static Rng rng;
 
-    if (platforms.empty()) {
-        float offset = 0;
+class PlatformManager {
+  private:
+    size_t _n;
+    std::vector<Platform> _platforms;
 
-        for (const auto &p : platformShapes) {
-            auto const size = p->getSize();
-            auto const pos = p->getPosition();
+    void createPlatforms() {
+        for (size_t i{0}; i < _n; i++) {
+            sf::Vector2f pos{GSettings.width + 1.0f * rng.getRandom(2, 3),
+                             GSettings.groundY - 1.0f * rng.getRandom(0, 30)};
+            sf::Vector2f size{1.0f * rng.getRandom(30, 50),
+                              1.0f * rng.getRandom(10, 25)};
 
-            const sf::Vector2f newPos = {(float)window.getSize().x + offset,
-                                         GSettings.groundY - size.y};
-            const sf::Vector2f acc = {1000.0f, 500.0f};
-            platforms.emplace_back(newPos, size, acc);
+            sf::Vector2f acc{1.0f * rng.getRandom(800, 1000), 0};
 
-            platforms.back().draw(window);
-
-            offset += size.x * 3;
+            _platforms.emplace_back(pos, size, acc);
         }
     }
-#if DEBUG
-    for (auto &p : platforms) {
-        /// std::cout << p.getSize().x << " | " << p.getSize().y << "\n";
-        // p.setPosition({300.0f, 150.0f});
-        p.draw(window);
+
+  public:
+    PlatformManager(size_t n)
+        : _n(n) {
+        createPlatforms();
     }
-
-#endif
-
-    for (auto &p : platforms) {
-        // std::cout << time << "\n";
-        p.moveLeft(time);
-        // std::cout << "Drawing platform\n";
-        // std::cout <<  "Position: " << p.getPosition().x << " | " <<
-        // p.getPosition().y << "\n";
-        if (p.getPosition().x + p.getSize().x < 0) {
-            p.setPosition(
-                {(float)window.getSize().x, GSettings.groundY - p.getSize().y});
+    void draw(sf::RenderWindow &window) {
+        for (auto &p : _platforms) {
+            p.draw(window);
         }
     }
+    void move(sf::RenderWindow& window, float time){
+        for (auto &p : platforms) {
+            p.moveLeft(time);
+            if (p.getPosition().x + p.getSize().x < 0) {
+                p.setPosition(
+                    {(float)window.getSize().x, GSettings.groundY - p.getSize().y});
+            }
+        }
+
+    }
+};
+
+static PlatformManager platformManager(3);
+void managePlatforms(sf::RenderWindow &window, float time) {
+    platformManager.move(window, time);
+    platformManager.draw(window);
 }
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
@@ -262,12 +267,14 @@ void Engine::run() {
     sf::RectangleShape boundingBox1 = addBoundingBox(window, treeSprite1);
     sf::RectangleShape boundingBox2 = addBoundingBox(window, treeSprite2);
 
-    std::vector<std::shared_ptr<const sf::RectangleShape>> platformsPtrs;
+    /*
+std::vector<std::shared_ptr<const sf::RectangleShape>> platformsPtrs;
 
-    platformsPtrs.emplace_back(
-        std::make_shared<const sf::RectangleShape>(boundingBox1));
-    platformsPtrs.emplace_back(
-        std::make_shared<const sf::RectangleShape>(boundingBox2));
+platformsPtrs.emplace_back(
+    std::make_shared<const sf::RectangleShape>(boundingBox1));
+platformsPtrs.emplace_back(
+    std::make_shared<const sf::RectangleShape>(boundingBox2));
+    */
 
     sf::Clock clock;
 
@@ -290,8 +297,9 @@ void Engine::run() {
             }
         }
         window.clear();
+        float time = clock.restart().asSeconds();
 
-        managePlatforms(window, clock.restart().asSeconds(), platformsPtrs);
+        //managePlatforms(window, time);
         InputState inputState = handleKeyPress();
         player.update(inputState);
         handleCollisions(player);
