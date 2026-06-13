@@ -1,10 +1,7 @@
-#include <random>
-
+#pragma once
 
 class Rng {
-private:
-    static std::mt19937 _gen;
 public:
-    int getRandom(int min, int max);
-
+    Rng() = delete;
+    static int getRandom(int min, int max);
 };

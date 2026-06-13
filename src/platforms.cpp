@@ -42,6 +42,10 @@ sf::Vector2f Platform::getSize() const {
     return _rect.getSize();
 }
 
+sf::Vector2f Platform::getOrigPosition() const {
+    return _pos;
+}
+
 sf::Vector2f Platform::getPosition() const {
     return _rect.getPosition();
 }

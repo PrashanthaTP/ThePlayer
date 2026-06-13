@@ -12,23 +12,26 @@ namespace ThePlayer {
 
 static std::vector<Platform> platforms;
 
-static Rng rng;
-
 class PlatformManager {
   private:
     size_t _n;
     std::vector<Platform> _platforms;
 
     void createPlatforms() {
+        int offset = 0;
         for (size_t i{0}; i < _n; i++) {
-            sf::Vector2f pos{GSettings.width + 1.0f * rng.getRandom(2, 3),
-                             GSettings.groundY - 1.0f * rng.getRandom(0, 30)};
-            sf::Vector2f size{1.0f * rng.getRandom(30, 50),
-                              1.0f * rng.getRandom(10, 25)};
 
-            sf::Vector2f acc{1.0f * rng.getRandom(800, 1000), 0};
+            sf::Vector2f size{1.0f * Rng::getRandom(60, 80),
+                              1.0f * Rng::getRandom(30, 40)};
+
+            sf::Vector2f pos{GSettings.width + 1.0f + offset,
+                             GSettings.groundY -
+                                 1.0f * Rng::getRandom(100, 200) - size.y};
+
+            sf::Vector2f acc{900.0f, 0.0f};
 
             _platforms.emplace_back(pos, size, acc);
+            offset = (i + 1) * Rng::getRandom(300, 400);
         }
     }
 
@@ -42,23 +45,31 @@ class PlatformManager {
             p.draw(window);
         }
     }
-    void move(sf::RenderWindow& window, float time){
-        for (auto &p : platforms) {
+
+    const std::vector<Platform> getPlatforms() const {
+        return _platforms;
+    }
+    void update(sf::RenderWindow &window, float time) {
+        for (auto &p : _platforms) {
             p.moveLeft(time);
+#if DEBUG
+            std::cout << "Platform:\n";
+            std::cout << p.getPosition().x << "\n";
+            std::cout << p.getPosition().y << "\n";
+            std::cout << p.getSize().x << "\n";
+            std::cout << p.getSize().y << "\n";
+#endif
             if (p.getPosition().x + p.getSize().x < 0) {
-                p.setPosition(
-                    {(float)window.getSize().x, GSettings.groundY - p.getSize().y});
+                p.setPosition({(float)window.getSize().x,
+                               GSettings.groundY -
+                                   1.0f * Rng::getRandom(100, 300) -
+                                   p.getSize().y});
             }
         }
-
     }
 };
 
 static PlatformManager platformManager(3);
-void managePlatforms(sf::RenderWindow &window, float time) {
-    platformManager.move(window, time);
-    platformManager.draw(window);
-}
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -177,7 +188,7 @@ void Engine::handleCollisions(Player &player) {
     float rightX = pos.x + size.x;
     float topY = pos.y;
     float bottomY = pos.y + size.y;
-    for (auto &platform : platforms) {
+    for (auto &platform : platformManager.getPlatforms()) {
 
         float pLeftX = platform.getPosition().x;
         float pRightX = pLeftX + platform.getSize().x;
@@ -299,7 +310,7 @@ platformsPtrs.emplace_back(
         window.clear();
         float time = clock.restart().asSeconds();
 
-        //managePlatforms(window, time);
+        platformManager.update(window, time);
         InputState inputState = handleKeyPress();
         player.update(inputState);
         handleCollisions(player);
@@ -316,9 +327,8 @@ platformsPtrs.emplace_back(
         // window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
-        for (auto &p : platforms) {
-            p.draw(window);
-        }
+
+        platformManager.draw(window);
 
         // std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
         // std::cout  << p.getPosition().x << " | " << p.getPosition().y <<

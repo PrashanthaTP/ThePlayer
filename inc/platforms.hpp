@@ -19,6 +19,7 @@ class Platform {
     void respawn();
     void draw(sf::RenderWindow &window);
     sf::Vector2f getSize() const;
+    sf::Vector2f getOrigPosition() const;
     sf::Vector2f getPosition() const;
     sf::Vector2f getLastMoveDist() const;
     void setPosition(sf::Vector2f pos);
