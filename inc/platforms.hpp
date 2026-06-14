@@ -27,3 +27,19 @@ class Platform {
     sf::RectangleShape &getRect();
 #endif
 };
+
+class PlatformManager {
+  private:
+    size_t _n;
+    std::vector<Platform> _platforms;
+
+    void createPlatforms();
+
+  public:
+    PlatformManager(size_t n);
+    void draw(sf::RenderWindow &window);
+
+    const std::vector<Platform> getPlatforms() const;
+    void update(sf::RenderWindow &window, float time);
+};
+
