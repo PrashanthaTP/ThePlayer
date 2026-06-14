@@ -3,6 +3,9 @@
 build_and_run="$1"
 
 script_dir="$(dirname ${BASH_SOURCE[0]})"
+if [[ -n "$2" ]]; then
+	cmake -s . -b build -g "unix makefiles"
+fi
 if [[ -n "${build_and_run}" ]]; then
 	cd ${script_dir}/build
 	make -j8 && { cd ..; ./build/bin/main; }
