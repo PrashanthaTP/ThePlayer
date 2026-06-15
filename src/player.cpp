@@ -111,6 +111,8 @@ void Player::handleGroundCollision() {
 void Player::handleCollision(const Platform &obj,
                              CollisionDirection direction) {
 
+    std::cout << "Collision Direction: " << getCollisionDirectionStr(direction)
+              << "\n";
     // regardless of the direction if the player is above the object,
     // then player should be able to stand on it ?
     sf::Vector2f playerPos = _rect.getPosition();
@@ -157,7 +159,8 @@ void Player::handleCollision(const Platform &obj,
     bool isPlayerXInBetweenObjX = standingNearLeftEdge || standingNearRightEdge;
 
     // if (playerTopY < objTopY && isPlayerXInBetweenObjX &&
-    if (overlap >= _rect.getSize().x / 2) { // place on top of platform
+    if (playerPos.y <= objPos.y &&
+        overlap >= _rect.getSize().x / 2) { // place on top of platform
         // no need to change position!?
         _rect.setPosition(
             {_rect.getPosition().x, obj.getPosition().y - _rect.getSize().y});
@@ -165,11 +168,14 @@ void Player::handleCollision(const Platform &obj,
         // otherwise this downward velocity keep buildling
         setGroundSupport(true);
         _physics.velocity.y = 0;
+#if 0
         std::cout << "last move dist: " << obj.getLastMoveDist().x << " | "
                   << obj.getLastMoveDist().y << "\n";
         std::cout << "x velocity: " << _physics.velocity.x << "\n";
-        std::cout << "Overlap: " << overlap << " / " << _rect.getSize().x  << "\n";
-#if 1
+        std::cout << "Overlap: " << overlap << " / " << _rect.getSize().x
+                  << "\n";
+#endif
+
         // move along with platform if the player is still or moving in the
         // opposite direction of the platform
         sf::Vector2f distCoveredByPlatform = obj.getLastMoveDist();
@@ -178,28 +184,42 @@ void Player::handleCollision(const Platform &obj,
             (distCoveredByPlatform.x > 0 && _physics.velocity.x <= 0)) {
             _rect.move(distCoveredByPlatform);
         }
-#endif
     } else {
         setGroundSupport(false);
-        _physics.velocity.x = 0;
         switch (direction) {
         case CollisionDirection::FROM_LEFT:
-            if (_physics.velocity.x >= 0)  //without this check the player just 'snaps' to wall once hit when walls are also moving left
-                {
+            if (_physics.velocity.x >=
+                0) // without this check the player just 'snaps' to wall once
+                   // hit when walls are also moving left
+            {
                 // the object is on the right
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
-                break;
             }
+            _physics.velocity.x = 0;
+            break;
         case CollisionDirection::FROM_RIGHT:
-            if (_physics.velocity.x <= 0) 
-                {
+            if (_physics.velocity.x <= 0) {
                 //  the object is on the left
                 _rect.setPosition({obj.getPosition().x + obj.getSize().x,
                                    _rect.getPosition().y});
-                break;
             }
 
+            _physics.velocity.x = 0;
+            break;
+        case CollisionDirection::FROM_BOTTOM:
+            if (_physics.velocity.y <= 0) {
+                //  the object is on the left
+                _rect.setPosition({_rect.getPosition().x,
+                                   obj.getPosition().y + obj.getSize().y});
+            }
+            break;
+            // reverse direction
+            _physics.velocity.y *= -1.0f;
+                //std::cout << "Y velocity: " << _physics.velocity.y << "\n";
+        case CollisionDirection::FROM_TOP:
+            _physics.velocity.y = 0;
+            break;
         default: {
             break;
         }

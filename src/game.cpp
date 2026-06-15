@@ -11,7 +11,7 @@
 namespace ThePlayer {
 
 static std::vector<Platform> platforms;
-static PlatformManager platformManager(3);
+static PlatformManager platformManager(4);
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -30,6 +30,8 @@ Engine::Engine() {
 Engine::~Engine() {
 }
 
+
+//TODO! Refine direction resolution logic
 [[nodiscard]] CollisionDirection
 #if DEBUG
 Engine::findCollisionDirection(Player &player,
