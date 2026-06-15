@@ -67,11 +67,11 @@ sf::RectangleShape &Platform::getRect() {
 #endif
 
 /*---------------------------------------------------------------
-*
-*         Platform Manager
-*
-*----------------------------------------------------------------
-*/
+ *
+ *         Platform Manager
+ *
+ *----------------------------------------------------------------
+ */
 PlatformManager::PlatformManager(size_t n)
     : _n(n) {
     createPlatforms();
@@ -81,17 +81,17 @@ void PlatformManager::createPlatforms() {
     int offset = 0;
     for (size_t i{0}; i < _n; i++) {
 
-        sf::Vector2f size{1.0f * Rng::getRandom(60, 80),
-                          1.0f * Rng::getRandom(30, 40)};
+        offset = i * Rng::getRandom(300, 400);
+
+        sf::Vector2f size{80, 40};
 
         sf::Vector2f pos{GSettings.width + 1.0f + offset,
-                         GSettings.groundY - 1.0f * Rng::getRandom(100, 200) -
+                         GSettings.groundY - 1.0f * Rng::getRandom(0, 80) -
                              size.y};
 
-        sf::Vector2f acc{900.0f, 0.0f};
+        sf::Vector2f acc{1.0f * Rng::getRandom(900, 1000), 0.0f};
 
         _platforms.emplace_back(pos, size, acc);
-        offset = (i + 1) * Rng::getRandom(300, 400);
     }
 }
 
@@ -115,8 +115,8 @@ void PlatformManager::update(sf::RenderWindow &window, float time) {
         std::cout << p.getSize().y << "\n";
 #endif
         if (p.getPosition().x + p.getSize().x < 0) {
-            p.setPosition({(float)window.getSize().x,
-                           GSettings.groundY - 1.0f * Rng::getRandom(100, 300) -
+            p.setPosition({(float)window.getSize().x + 1.0f * Rng::getRandom(0,200),
+                           GSettings.groundY - 1.0f * Rng::getRandom(0,80) -
                                p.getSize().y});
         }
     }
