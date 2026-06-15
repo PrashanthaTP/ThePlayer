@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <string>
+
 enum class CollisionObject : uint8_t { COLLISION_WALL, COLLISION_GROUND };
 
 enum class CollisionDirection : uint8_t {
@@ -8,3 +10,6 @@ enum class CollisionDirection : uint8_t {
     FROM_TOP,
     FROM_BOTTOM
 };
+
+
+std::string getCollisionDirectionStr(CollisionDirection dir);
