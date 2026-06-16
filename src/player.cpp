@@ -113,7 +113,7 @@ void Player::handleCollision(const Platform &obj,
 
     std::cout << "Collision Direction: " << getCollisionDirectionStr(direction)
               << "\n";
-    // regardless of the direction if the player is above the object,
+    // regardless of the direction if the player is above the object (not bottom though right?)
     // then player should be able to stand on it ?
     sf::Vector2f playerPos = _rect.getPosition();
     sf::Vector2f playerSize = _rect.getSize();
@@ -162,6 +162,7 @@ void Player::handleCollision(const Platform &obj,
     if (playerPos.y <= objPos.y &&
         overlap >= _rect.getSize().x / 2) { // place on top of platform
         // no need to change position!?
+        std::cout << "Condition 1\n";
         _rect.setPosition(
             {_rect.getPosition().x, obj.getPosition().y - _rect.getSize().y});
         // when player is moved from the edge it wont fall immediately
@@ -209,14 +210,15 @@ void Player::handleCollision(const Platform &obj,
             break;
         case CollisionDirection::FROM_BOTTOM:
             if (_physics.velocity.y <= 0) {
-                //  the object is on the left
+                //  the object is below the 'object'
                 _rect.setPosition({_rect.getPosition().x,
                                    obj.getPosition().y + obj.getSize().y});
             }
-            break;
             // reverse direction
-            _physics.velocity.y *= -1.0f;
-                //std::cout << "Y velocity: " << _physics.velocity.y << "\n";
+            //_physics.velocity.y *= -1.0f; // increased gravity -> faster downward movement
+
+            _physics.velocity.y = 0;
+            break;
         case CollisionDirection::FROM_TOP:
             _physics.velocity.y = 0;
             break;
