@@ -1,5 +1,5 @@
 #!/bin/env bash
 #
 #
-#cmake -S . -B build -G "Unix Makefiles"
+#cmake -s . -b build -g "unix makefiles"
 cd build; make -j8
