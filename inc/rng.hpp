@@ -1,7 +1,7 @@
 #pragma once
 
 class Rng {
-public:
+  public:
     Rng() = delete;
     static int getRandom(int min, int max);
 };
