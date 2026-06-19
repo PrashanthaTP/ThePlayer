@@ -207,30 +207,6 @@ void Engine::run() {
     sf::Sprite bgSprite(bgTexture);
     bgSprite.setPosition({0.0f, 0.0f});
 
-    sf::Texture treeTexture;
-    if (!treeTexture.loadFromFile("assets/experiment/02_tree.png")) {
-        std::cerr << "Error loading tree image;\n";
-        exit(EXIT_FAILURE);
-    }
-    sf::Sprite treeSprite1(treeTexture);
-    treeSprite1.setPosition(
-        {100.0f, GSettings.groundY - treeTexture.getSize().y});
-    sf::Sprite treeSprite2(treeTexture);
-    treeSprite2.setPosition(
-        {400.0f, GSettings.groundY - treeTexture.getSize().y});
-
-    sf::RectangleShape boundingBox1 = addBoundingBox(window, treeSprite1);
-    sf::RectangleShape boundingBox2 = addBoundingBox(window, treeSprite2);
-
-    /*
-std::vector<std::shared_ptr<const sf::RectangleShape>> platformsPtrs;
-
-platformsPtrs.emplace_back(
-    std::make_shared<const sf::RectangleShape>(boundingBox1));
-platformsPtrs.emplace_back(
-    std::make_shared<const sf::RectangleShape>(boundingBox2));
-    */
-
     sf::Clock clock;
 
     PlayerPhysics physics = {
@@ -265,18 +241,11 @@ platformsPtrs.emplace_back(
 
         window.draw(bgSprite);
 
-        // window.draw(treeSprite1);
-        // window.draw(treeSprite2);
-        // window.draw(boundingBox1);
-        // window.draw(boundingBox2);
         window.draw(player.getDrawObj());
         window.draw(groundLine);
 
         platformManager.draw(window);
-
-        // std::cout  << p.getSize().x << " | " << p.getSize().y << "\n";
-        // std::cout  << p.getPosition().x << " | " << p.getPosition().y <<
-        // "\n"; window.draw(p.getRect());
+        
         window.display();
     }
 }
