@@ -1,3 +1,6 @@
+// TODO: 
+// Game window -> creation at desktop center
+// Cursor -> pointer on clickable objects
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -5,6 +8,7 @@
 
 #include "constants.hpp"
 #include "game.hpp"
+#include "game_states.hpp"
 #include "platforms.hpp"
 #include "rng.hpp"
 
@@ -30,8 +34,7 @@ Engine::Engine() {
 Engine::~Engine() {
 }
 
-
-//TODO! Refine direction resolution logic
+// TODO! Refine direction resolution logic
 [[nodiscard]] CollisionDirection
 #if DEBUG
 Engine::findCollisionDirection(Player &player,
@@ -193,9 +196,35 @@ void Engine::run() {
                             sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(30);
 
+    sf::Font font;
+    if (!font.openFromFile("assets/fonts/ComicNeue-Regular.ttf")) {
+        std::cerr << "Unable to open font\n";
+        return exit(EXIT_FAILURE);
+    }
+
+    sf::Text text(font);
+    text.setString("Start");
+    text.setCharacterSize(21);
+    text.setFillColor(sf::Color::Black);
+
+    // Set text's origin to its own center
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setOrigin({textRect.position.x + textRect.size.x / 2.0f,
+                    textRect.position.y + textRect.size.y / 2.0f});
+
     sf::RectangleShape groundLine({GSettings.width * 1.0f, 2});
     groundLine.setFillColor(sf::Color::Red);
     groundLine.setPosition({0, GSettings.groundY});
+
+    sf::RectangleShape startButton({100, 30});
+    startButton.setFillColor(sf::Color::White);
+    startButton.setPosition(
+        {GSettings.width / 2.0f - 50.0f, GSettings.height / 2.0f - 15.0f});
+
+    sf::Vector2f rectPos = startButton.getPosition();
+    sf::Vector2f rectSize = startButton.getSize();
+    text.setPosition(
+        {rectPos.x + rectSize.x / 2.0f, rectPos.y + rectSize.y / 2.0f});
 
     sf::Texture bgTexture;
 
@@ -206,6 +235,14 @@ void Engine::run() {
 
     sf::Sprite bgSprite(bgTexture);
     bgSprite.setPosition({0.0f, 0.0f});
+
+    sf::Texture startBgTexture;
+    if (!bgTexture.loadFromFile("assets/start.png")) {
+        std::cerr << "Error loading start background image;\n";
+        exit(EXIT_FAILURE);
+    }
+    sf::Sprite startBgSprite(startBgTexture);
+    startBgSprite.setPosition({0.0f, 0.0f});
 
     sf::Clock clock;
 
@@ -221,31 +258,47 @@ void Engine::run() {
         .groundY = GSettings.groundY};
     Player player(physics);
 
+    GameState gState = GameState::GS_FIRST_SCREEN;
+
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
         }
-        window.clear();
-        float time = clock.restart().asSeconds();
-
-        platformManager.update(window, time);
-        InputState inputState = handleKeyPress();
-        player.update(inputState);
-        handleCollisions(player);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
             window.close();
         }
 
-        window.draw(bgSprite);
+        window.clear();
 
-        window.draw(player.getDrawObj());
-        window.draw(groundLine);
+        switch (gState) {
+        case GameState::GS_FIRST_SCREEN:
+            window.draw(startBgSprite);
+            window.draw(startButton);
+            window.draw(text);
+            break;
+        case GameState::GS_START: {
+            float time = clock.restart().asSeconds();
 
-        platformManager.draw(window);
-        
+            platformManager.update(window, time);
+            InputState inputState = handleKeyPress();
+            player.update(inputState);
+            handleCollisions(player);
+
+            window.draw(bgSprite);
+
+            window.draw(player.getDrawObj());
+            window.draw(groundLine);
+
+            platformManager.draw(window);
+            break;
+        }
+        default:
+            break;
+        }
+
         window.display();
     }
 }
