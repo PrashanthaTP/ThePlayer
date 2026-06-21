@@ -113,8 +113,8 @@ void Player::handleCollision(const Platform &obj,
 
     std::cout << "Collision Direction: " << getCollisionDirectionStr(direction)
               << "\n";
-    // regardless of the direction if the player is above the object (not bottom though right?)
-    // then player should be able to stand on it ?
+    // regardless of the direction if the player is above the object (not bottom
+    // though right?) then player should be able to stand on it ?
     sf::Vector2f playerPos = _rect.getPosition();
     sf::Vector2f playerSize = _rect.getSize();
 
@@ -162,6 +162,10 @@ void Player::handleCollision(const Platform &obj,
     bool isPlayerXInBetweenObjX = standingNearLeftEdge || standingNearRightEdge;
 
     // if (playerTopY < objTopY && isPlayerXInBetweenObjX &&
+    //
+    // If we check for bottom y position the player just 'goes into' platform,
+    // why ? playerPos.y + playerSize.x <= objPos.y ?
+    //
     if (playerPos.y <= objPos.y &&
         overlap >= _rect.getSize().x / 2) { // place on top of platform
         // no need to change position!?
@@ -200,7 +204,7 @@ void Player::handleCollision(const Platform &obj,
                 std::cout << "Snapping from left\n";
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
-            _physics.velocity.x = 0;
+                _physics.velocity.x = 0;
             }
             break;
         case CollisionDirection::FROM_RIGHT:
@@ -208,7 +212,7 @@ void Player::handleCollision(const Platform &obj,
                 //  the object is on the left
                 _rect.setPosition({obj.getPosition().x + obj.getSize().x,
                                    _rect.getPosition().y});
-            _physics.velocity.x = 0;
+                _physics.velocity.x = 0;
             }
 
             break;
@@ -217,10 +221,11 @@ void Player::handleCollision(const Platform &obj,
                 //  the object is below the 'object'
                 _rect.setPosition({_rect.getPosition().x,
                                    obj.getPosition().y + obj.getSize().y});
-            // reverse direction
-            //_physics.velocity.y *= -1.0f; // increased gravity -> faster downward movement
+                // reverse direction
+                //_physics.velocity.y *= -1.0f; // increased gravity -> faster
+                // downward movement
 
-            _physics.velocity.y = 0;
+                _physics.velocity.y = 0;
             }
             break;
         case CollisionDirection::FROM_TOP:
