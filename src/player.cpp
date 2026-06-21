@@ -131,6 +131,7 @@ void Player::handleCollision(const Platform &obj,
     float overlap = 0;
     // TODO!! : Rethink about this logic
     if (playerPos.x < objPos.x && playerPos.x + playerSize.x > objPos.x) {
+        std::cout << "overlap 1\n";
         standingNearLeftEdge = true;
 
         /*
@@ -148,11 +149,13 @@ void Player::handleCollision(const Platform &obj,
             objSize.x - (objPos.x + objSize.x - (playerPos.x + playerSize.x));
     } else if (playerPos.x + playerSize.x > objPos.x + objSize.x &&
                playerPos.x < objPos.x + objSize.x) {
+        std::cout << "overlap 2\n";
         standingNearRightEdge = true;
         overlap = objSize.x - (playerPos.x - objPos.x);
     } else if (playerPos.x > objPos.x &&
                playerPos.x + playerSize.x < objPos.x + objSize.x) {
         // full overlap
+        std::cout << "overlap 3\n";
         overlap = playerSize.x;
     }
     // UNUSED ?
@@ -194,30 +197,31 @@ void Player::handleCollision(const Platform &obj,
                    // hit when walls are also moving left
             {
                 // the object is on the right
+                std::cout << "Snapping from left\n";
                 _rect.setPosition({obj.getPosition().x - _rect.getSize().x,
                                    _rect.getPosition().y});
-            }
             _physics.velocity.x = 0;
+            }
             break;
         case CollisionDirection::FROM_RIGHT:
             if (_physics.velocity.x <= 0) {
                 //  the object is on the left
                 _rect.setPosition({obj.getPosition().x + obj.getSize().x,
                                    _rect.getPosition().y});
+            _physics.velocity.x = 0;
             }
 
-            _physics.velocity.x = 0;
             break;
         case CollisionDirection::FROM_BOTTOM:
             if (_physics.velocity.y <= 0) {
                 //  the object is below the 'object'
                 _rect.setPosition({_rect.getPosition().x,
                                    obj.getPosition().y + obj.getSize().y});
-            }
             // reverse direction
             //_physics.velocity.y *= -1.0f; // increased gravity -> faster downward movement
 
             _physics.velocity.y = 0;
+            }
             break;
         case CollisionDirection::FROM_TOP:
             _physics.velocity.y = 0;
