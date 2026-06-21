@@ -1,4 +1,4 @@
-// TODO: 
+// TODO:
 // Game window -> creation at desktop center
 // Cursor -> pointer on clickable objects
 #include <cstdlib>
@@ -36,12 +36,7 @@ Engine::~Engine() {
 
 // TODO! Refine direction resolution logic
 [[nodiscard]] CollisionDirection
-#if DEBUG
-Engine::findCollisionDirection(Player &player,
-                               const sf::RectangleShape &platform) {
-#else
 Engine::findCollisionDirection(const Player &player, const Platform &platform) {
-#endif
     const sf::Vector2f size = player.getSize();
     const sf::Vector2f pos = player.getPosition();
     float leftX = pos.x;
@@ -88,46 +83,6 @@ Engine::findCollisionDirection(const Player &player, const Platform &platform) {
     return resDir;
 }
 
-#if DEBUG
-void Engine::handleCollisions(
-    Player &player,
-    std::vector<std::shared_ptr<const sf::RectangleShape>> &platforms) {
-    const sf::Vector2f size = player.getSize();
-    const sf::Vector2f pos = player.getPosition();
-    float leftX = pos.x;
-    float rightX = pos.x + size.x;
-    float topY = pos.y;
-    float bottomY = pos.y + size.y;
-    for (auto &platform_p : platforms) {
-        if (!platform_p) {
-            continue;
-        }
-
-        auto platform = *platform_p;
-        float pLeftX = platform.getPosition().x;
-        float pRightX = pLeftX + platform.getSize().x;
-        float pTopY = platform.getPosition().y;
-        float pBottomY = pTopY + platform.getSize().y;
-#ifdef DEBUG
-        std::cout << leftX << " | " << rightX << " | " << topY << " | "
-                  << bottomY << "\n";
-        std::cout << pLeftX << " | " << pRightX << " | " << pTopY << " | "
-                  << pBottomY << "\n";
-#endif
-        bool xColliding = rightX >= pLeftX && leftX <= pRightX;
-        bool yColliding = topY <= pBottomY && bottomY >= pTopY;
-        if (xColliding && yColliding) {
-            CollisionDirection direction =
-                findCollisionDirection(player, platform);
-            player.handleCollision(platform, direction);
-        }
-    }
-    if (bottomY >= GSettings.groundY) {
-        player.handleGroundCollision();
-    }
-}
-#endif
-
 void Engine::handleCollisions(Player &player) {
     const sf::Vector2f size = player.getSize();
     const sf::Vector2f pos = player.getPosition();
@@ -141,12 +96,6 @@ void Engine::handleCollisions(Player &player) {
         float pRightX = pLeftX + platform.getSize().x;
         float pTopY = platform.getPosition().y;
         float pBottomY = pTopY + platform.getSize().y;
-#ifdef DEBUG
-        std::cout << leftX << " | " << rightX << " | " << topY << " | "
-                  << bottomY << "\n";
-        std::cout << pLeftX << " | " << pRightX << " | " << pTopY << " | "
-                  << pBottomY << "\n";
-#endif
         bool xColliding = rightX >= pLeftX && leftX <= pRightX;
         bool yColliding = topY <= pBottomY && bottomY >= pTopY;
         if (xColliding && yColliding) {
