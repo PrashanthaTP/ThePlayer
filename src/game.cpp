@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "constants.hpp"
@@ -139,6 +140,20 @@ void Engine::handleCollisions(Player &player) {
     return inputState;
 }
 
+void setCursorToType(sf::RenderWindow &window, sf::Cursor::Type cursorType) {
+    // BUG!! -> Local scope cursor -> should live as long as the `window` for proper functionality
+    const auto cursor = sf::Cursor::createFromSystem(cursorType).value();
+    window.setMouseCursor(cursor);
+}
+
+bool checkIfCursorWithinBounds(sf::RenderWindow &window,
+                               const sf::RectangleShape &shape) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePosF = window.mapPixelToCoords(mousePos);
+    sf::FloatRect bounds = shape.getGlobalBounds();
+    return bounds.contains(mousePosF);
+}
+
 void Engine::run() {
     sf::RenderWindow window(sf::VideoMode({GSettings.width, GSettings.height}),
                             GSettings.name,
@@ -186,7 +201,7 @@ void Engine::run() {
     bgSprite.setPosition({0.0f, 0.0f});
 
     sf::Texture startBgTexture;
-    if (!bgTexture.loadFromFile("assets/start.png")) {
+    if (!startBgTexture.loadFromFile("assets/start.png")) {
         std::cerr << "Error loading start background image;\n";
         exit(EXIT_FAILURE);
     }
@@ -207,12 +222,20 @@ void Engine::run() {
         .groundY = GSettings.groundY};
     Player player(physics);
 
-    GameState gState = GameState::GS_FIRST_SCREEN;
+    GameState gameState = GameState::GS_FIRST_SCREEN;
 
+    std::optional<sf::Cursor> cursor;
+    sf::Vector2f mouseClickPosition;
     while (window.isOpen()) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
+            }
+            if (const auto *mouseEvent =
+                    event->getIf<sf::Event::MouseButtonPressed>()) {
+                if (mouseEvent->button == sf::Mouse::Button::Left) {
+                    mouseClickPosition = window.mapPixelToCoords(mouseEvent->position);
+                }
             }
         }
 
@@ -220,10 +243,28 @@ void Engine::run() {
             window.close();
         }
 
-        window.clear();
+        /*if(event->is<sf::Event::MouseButtonPressed>()){
 
-        switch (gState) {
+        }*/
+        window.clear();
+        //setCursorToType(window, sf::Cursor::Type::Arrow);
+        cursor = sf::Cursor::createFromSystem(sf::Cursor::Type::Arrow);
+        window.setMouseCursor(cursor.value());
+        //
+        switch (gameState) {
         case GameState::GS_FIRST_SCREEN:
+            if (checkIfCursorWithinBounds(window, startButton)) {
+                //setCursorToType(window, sf::Cursor::Type::Hand);
+                cursor = sf::Cursor::createFromSystem(sf::Cursor::Type::Hand);
+                window.setMouseCursor(cursor.value());
+                    
+                if (startButton.getGlobalBounds().contains(
+                        mouseClickPosition)) {
+                    gameState = GameState::GS_START;
+                }
+            } else {
+                //setCursorToType(window, sf::Cursor::Type::Arrow);
+            }
             window.draw(startBgSprite);
             window.draw(startButton);
             window.draw(text);
