@@ -124,10 +124,12 @@ void PlatformManager::update(sf::RenderWindow &window, float time) {
         std::cout << p.getSize().x << "\n";
         std::cout << p.getSize().y << "\n";
 #endif
-        if (p.getPosition().x + p.getSize().x < 0) {
+        if ((p.getPosition().x + p.getSize().x) < 0.0f) {
             std::cout << p.getPosition().x << " | " << p.getSize().x << "\n";
             std::cout << "Calling set position\n";
-            p.setPosition({(float)window.getSize().x + 1.0f * Rng::getRandom(0,200),
+            sf::Vector2f origPos = p.getOrigPosition();
+            //p.setPosition({(float)window.getSize().x + 1.0f * Rng::getRandom(0,200),
+            p.setPosition({origPos.x,
                            GSettings.groundY - 1.0f * Rng::getRandom(0,80) -
                                p.getSize().y});
         }
