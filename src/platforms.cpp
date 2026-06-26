@@ -25,7 +25,9 @@ void Platform::moveToOrigPos() {
 
 void Platform::moveLeft(float time) {
     sf::Vector2f dist{-1 * _acc.x * time * time, 0.0f};
+    std::cout << "Position in moveLeft: " << _rect.getPosition().x << "| " << _acc.x << "|" << time << "\n";
     _rect.move(dist);
+    std::cout << "Position in moveLeft 2: " << _rect.getPosition().x << "\n";
     _lastMoveDist = dist;
 }
 
@@ -95,7 +97,7 @@ void PlatformManager::createPlatforms() {
 
         std::cout << "offset: " << offset << " : " << pos.x << "\n";
         //sf::Vector2f acc{1.0f * Rng::getRandom(900, 1000), 0.0f};
-        sf::Vector2f acc{1000.0f, 0.0f};
+        sf::Vector2f acc{1200.0f, 0.0f};
 
         _platforms.emplace_back(pos, size, acc);
     }
@@ -117,16 +119,18 @@ void PlatformManager::update(sf::RenderWindow &window, float time) {
     for (auto &p : _platforms) {
         std::cout << p.getPosition().x << " | " << p.getSize().x << "\n";
         p.moveLeft(time);
-#if DEBUG
+//#if DEBUG
         std::cout << "Platform:\n";
         std::cout << p.getPosition().x << "\n";
         std::cout << p.getPosition().y << "\n";
         std::cout << p.getSize().x << "\n";
         std::cout << p.getSize().y << "\n";
-#endif
+//#endif
         if ((p.getPosition().x + p.getSize().x) < 0.0f) {
+            std::cout << "===============\n";
             std::cout << p.getPosition().x << " | " << p.getSize().x << "\n";
             std::cout << "Calling set position\n";
+            std::cout << "===============\n";
             sf::Vector2f origPos = p.getOrigPosition();
             //p.setPosition({(float)window.getSize().x + 1.0f * Rng::getRandom(0,200),
             p.setPosition({origPos.x,
