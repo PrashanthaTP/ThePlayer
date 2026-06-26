@@ -251,6 +251,7 @@ void Engine::run() {
         cursor = sf::Cursor::createFromSystem(sf::Cursor::Type::Arrow);
         window.setMouseCursor(cursor.value());
         //
+        float time = clock.restart().asSeconds();
         switch (gameState) {
         case GameState::GS_FIRST_SCREEN:
             if (checkIfCursorWithinBounds(window, startButton)) {
@@ -270,7 +271,6 @@ void Engine::run() {
             window.draw(text);
             break;
         case GameState::GS_START: {
-            float time = clock.restart().asSeconds();
 
             platformManager.update(window, time);
             InputState inputState = handleKeyPress();

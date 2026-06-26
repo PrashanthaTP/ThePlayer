@@ -85,7 +85,6 @@ void PlatformManager::createPlatforms() {
     for (size_t i{0}; i < _n; i++) {
 
         //offset = i * Rng::getRandom(300, 400);
-        offset += 500;
 
         sf::Vector2f size{80, 40};
 
@@ -97,6 +96,7 @@ void PlatformManager::createPlatforms() {
         sf::Vector2f acc{1200.0f, 0.0f};
 
         _platforms.emplace_back(pos, size, acc);
+        offset += 250;
     }
 }
 void PlatformManager::draw(sf::RenderWindow &window) {
