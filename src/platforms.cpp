@@ -92,8 +92,7 @@ void PlatformManager::createPlatforms() {
                          GSettings.groundY - 1.0f * Rng::getRandom(30, 100) -
                              size.y};
 
-        //sf::Vector2f acc{1.0f * Rng::getRandom(900, 1000), 0.0f};
-        sf::Vector2f acc{1200.0f, 0.0f};
+        sf::Vector2f acc{1.0f * Rng::getRandom(1250, 1500), 0.0f};
 
         _platforms.emplace_back(pos, size, acc);
         offset += 250;
