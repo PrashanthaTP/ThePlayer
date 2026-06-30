@@ -42,4 +42,3 @@ class PlatformManager {
     const std::vector<Platform> getPlatforms() const;
     void update(sf::RenderWindow &window, float time);
 };
-

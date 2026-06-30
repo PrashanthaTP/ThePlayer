@@ -11,5 +11,4 @@ enum class CollisionDirection : uint8_t {
     FROM_BOTTOM
 };
 
-
 std::string getCollisionDirectionStr(CollisionDirection dir);

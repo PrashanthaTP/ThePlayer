@@ -20,7 +20,6 @@ Platform::Platform(const sf::Vector2f pos,
 void Platform::moveToOrigPos() {
     _rect.setPosition(_pos);
     std::cout << "Position: " << _rect.getPosition().x << "\n";
-
 }
 
 void Platform::moveLeft(float time) {
@@ -59,7 +58,7 @@ sf::Vector2f Platform::getLastMoveDist() const {
     return _lastMoveDist;
 }
 void Platform::setPosition(sf::Vector2f pos) {
-    std::cout <<"SetPosition called: " << pos.x << "," << pos.y << "\n";
+    std::cout << "SetPosition called: " << pos.x << "," << pos.y << "\n";
     _rect.setPosition(pos);
 }
 
@@ -84,7 +83,7 @@ void PlatformManager::createPlatforms() {
     int offset = 0;
     for (size_t i{0}; i < _n; i++) {
 
-        //offset = i * Rng::getRandom(300, 400);
+        // offset = i * Rng::getRandom(300, 400);
 
         sf::Vector2f size{80, 40};
 
@@ -121,9 +120,10 @@ void PlatformManager::update(sf::RenderWindow &window, float time) {
 #endif
         if ((p.getPosition().x + p.getSize().x) < 0.0f) {
             sf::Vector2f origPos = p.getOrigPosition();
-            //p.setPosition({(float)window.getSize().x + 1.0f * Rng::getRandom(0,200),
+            // p.setPosition({(float)window.getSize().x + 1.0f *
+            // Rng::getRandom(0,200),
             p.setPosition({origPos.x,
-                           GSettings.groundY - 1.0f * Rng::getRandom(0,80) -
+                           GSettings.groundY - 1.0f * Rng::getRandom(0, 80) -
                                p.getSize().y});
         }
     }

@@ -141,7 +141,8 @@ void Engine::handleCollisions(Player &player) {
 }
 
 void setCursorToType(sf::RenderWindow &window, sf::Cursor::Type cursorType) {
-    // BUG!! -> Local scope cursor -> should live as long as the `window` for proper functionality
+    // BUG!! -> Local scope cursor -> should live as long as the `window` for
+    // proper functionality
     const auto cursor = sf::Cursor::createFromSystem(cursorType).value();
     window.setMouseCursor(cursor);
 }
@@ -234,7 +235,8 @@ void Engine::run() {
             if (const auto *mouseEvent =
                     event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mouseEvent->button == sf::Mouse::Button::Left) {
-                    mouseClickPosition = window.mapPixelToCoords(mouseEvent->position);
+                    mouseClickPosition =
+                        window.mapPixelToCoords(mouseEvent->position);
                 }
             }
         }
@@ -247,7 +249,7 @@ void Engine::run() {
 
         }*/
         window.clear();
-        //setCursorToType(window, sf::Cursor::Type::Arrow);
+        // setCursorToType(window, sf::Cursor::Type::Arrow);
         cursor = sf::Cursor::createFromSystem(sf::Cursor::Type::Arrow);
         window.setMouseCursor(cursor.value());
         //
@@ -255,16 +257,16 @@ void Engine::run() {
         switch (gameState) {
         case GameState::GS_FIRST_SCREEN:
             if (checkIfCursorWithinBounds(window, startButton)) {
-                //setCursorToType(window, sf::Cursor::Type::Hand);
+                // setCursorToType(window, sf::Cursor::Type::Hand);
                 cursor = sf::Cursor::createFromSystem(sf::Cursor::Type::Hand);
                 window.setMouseCursor(cursor.value());
-                    
+
                 if (startButton.getGlobalBounds().contains(
                         mouseClickPosition)) {
                     gameState = GameState::GS_START;
                 }
             } else {
-                //setCursorToType(window, sf::Cursor::Type::Arrow);
+                // setCursorToType(window, sf::Cursor::Type::Arrow);
             }
             window.draw(startBgSprite);
             window.draw(startButton);

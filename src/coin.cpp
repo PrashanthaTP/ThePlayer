@@ -10,9 +10,11 @@ void Coin::draw(sf::RenderWindow &window) {
     window.draw(_obj);
 }
 
+CoinManager::CoinManager() {
+}
 
-CoinManager::CoinManager(){}
+void CoinManager::update(sf::RenderWindow &window, float time) {
+}
 
-void CoinManager::update(sf::RenderWindow &window, float time){}
-
-void CoinManager::draw(sf::RenderWindow &window){}
+void CoinManager::draw(sf::RenderWindow &window) {
+}

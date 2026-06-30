@@ -1,6 +1,5 @@
 #include "collisions.hpp"
 
-
 std::string getCollisionDirectionStr(CollisionDirection dir) {
     std::string res;
     switch (dir) {
