@@ -1,5 +1,6 @@
 #pragma once
 #include <sfml/Graphics.hpp>
+#include <vector>
 
 class Coin {
   private:
@@ -13,8 +14,13 @@ class Coin {
 };
 
 class CoinManager {
+  private:
+    int _n;
+    std::vector<Coin> _coins;
+    void createCoins();
+
   public:
-    CoinManager();
+    CoinManager(int n);
     void update(sf::RenderWindow &window, float time);
     void draw(sf::RenderWindow &window);
 };
