@@ -7,6 +7,7 @@
 #include <optional>
 #include <vector>
 
+#include "coin.hpp"
 #include "constants.hpp"
 #include "game.hpp"
 #include "game_states.hpp"
@@ -17,6 +18,7 @@ namespace ThePlayer {
 
 static std::vector<Platform> platforms;
 static PlatformManager platformManager(4);
+static CoinManager coinManager(4);
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -285,6 +287,7 @@ void Engine::run() {
             window.draw(groundLine);
 
             platformManager.draw(window);
+            coinManager.draw(window);
             break;
         }
         default:
