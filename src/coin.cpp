@@ -7,6 +7,7 @@ Coin::Coin(int val, float radius)
       _obj(sf::CircleShape(radius)) {
     _obj.setFillColor(sf::Color::Yellow);
     _obj.setOutlineColor(sf::Color::Blue);
+    _obj.setOutlineThickness(5.0f);
 }
 
 void Coin::draw(sf::RenderWindow &window) {
