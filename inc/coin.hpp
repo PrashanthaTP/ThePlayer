@@ -25,4 +25,5 @@ class CoinManager {
     CoinManager(int n);
     void update(sf::RenderWindow &window, float time);
     void draw(sf::RenderWindow &window);
+    const std::vector<Coin> &getCoins();
 };

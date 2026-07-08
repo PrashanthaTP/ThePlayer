@@ -107,6 +107,13 @@ void Engine::handleCollisions(Player &player) {
             player.handleCollision(platform, direction);
         }
     }
+
+    // coin collision
+    for (auto &coin : coinManager.getCoins()) {
+        // check for collision
+        // notify Coin/CoinManager of collision
+    }
+
     if (bottomY >= GSettings.groundY) {
         player.handleGroundCollision();
     }

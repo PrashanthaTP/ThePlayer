@@ -1,6 +1,7 @@
 #include "coin.hpp"
-#include <iostream>
 #include "rng.hpp"
+#include <iostream>
+#include <vector>
 
 Coin::Coin(int val, float radius)
     : _val(val),
@@ -34,10 +35,10 @@ void CoinManager::createCoins() {
     float xOffset = 100;
     for (int i{0}; i < _n; i++) {
         _coins.emplace_back(10, 15);
-        _coins.back().setPosition({xOffset * i + 100.0f, 1.0f * Rng::getRandom(120,180)});
+        _coins.back().setPosition(
+            {xOffset * i + 100.0f, 1.0f * Rng::getRandom(120, 180)});
     }
 }
-
 
 void CoinManager::update(sf::RenderWindow &window, float time) {
 }
@@ -50,4 +51,8 @@ void CoinManager::draw(sf::RenderWindow &window) {
             once = false;
         }
     }
+}
+
+const std::vector<Coin> &CoinManager::getCoins() {
+    return _coins;
 }
