@@ -20,7 +20,7 @@ void Coin::setPosition(sf::Vector2f pos) {
     _obj.setPosition(pos);
 }
 
-sf::Vector2f Coin::getPosition() {
+sf::Vector2f Coin::getPosition() const {
     return _obj.getPosition();
 }
 

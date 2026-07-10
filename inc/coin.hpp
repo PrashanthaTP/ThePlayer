@@ -12,7 +12,7 @@ class Coin {
     Coin(int val, float radius);
     void draw(sf::RenderWindow &window);
     void setPosition(sf::Vector2f pos);
-    sf::Vector2f getPosition();
+    sf::Vector2f getPosition() const;
 };
 
 class CoinManager {
