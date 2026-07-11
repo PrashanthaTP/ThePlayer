@@ -24,6 +24,10 @@ sf::Vector2f Coin::getPosition() const {
     return _obj.getPosition();
 }
 
+const sf::FloatRect Coin::getGlobalBounds() const{
+    return _obj.getGlobalBounds();
+}
+
 CoinManager::CoinManager(int n)
     : _n(n) {
     createCoins();

@@ -13,6 +13,7 @@ class Coin {
     void draw(sf::RenderWindow &window);
     void setPosition(sf::Vector2f pos);
     sf::Vector2f getPosition() const;
+    const sf::FloatRect getGlobalBounds() const;
 };
 
 class CoinManager {

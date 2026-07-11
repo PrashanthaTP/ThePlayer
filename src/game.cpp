@@ -108,10 +108,16 @@ void Engine::handleCollisions(Player &player) {
         }
     }
 
+    sf::FloatRect playerBb = player.getDrawObj().getGlobalBounds();
     // coin collision
     for (auto &coin : coinManager.getCoins()) {
         // check for collision
         // notify Coin/CoinManager of collision
+        const sf::FloatRect coinBb = coin.getGlobalBounds();
+        if (const std::optional<sf::FloatRect> overlap =
+                coinBb.findIntersection(playerBb)) {
+            std::cout << "Coin collected!!\n";
+        }
     }
 
     if (bottomY >= GSettings.groundY) {
