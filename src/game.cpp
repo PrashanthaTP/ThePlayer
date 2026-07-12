@@ -116,6 +116,7 @@ void Engine::handleCollisions(Player &player) {
         const sf::FloatRect coinBb = coin.getGlobalBounds();
         if (const std::optional<sf::FloatRect> overlap =
                 coinBb.findIntersection(playerBb)) {
+            coin.notifyCollision();
             std::cout << "Coin collected!!\n";
         }
     }

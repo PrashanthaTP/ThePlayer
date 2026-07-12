@@ -6,6 +6,7 @@
 Coin::Coin(int val, float radius)
     : _val(val),
       _radius(radius),
+      _isHidden(false),
       _obj(sf::CircleShape(radius)) {
     _obj.setFillColor(sf::Color::Yellow);
     _obj.setOutlineColor(sf::Color::Blue);
@@ -13,10 +14,14 @@ Coin::Coin(int val, float radius)
 }
 
 void Coin::draw(sf::RenderWindow &window) {
+    if (_isHidden) {
+        return;
+    }
     window.draw(_obj);
 }
 
 void Coin::setPosition(sf::Vector2f pos) {
+    _prevPos = _obj.getPosition();
     _obj.setPosition(pos);
 }
 
@@ -24,8 +29,17 @@ sf::Vector2f Coin::getPosition() const {
     return _obj.getPosition();
 }
 
-const sf::FloatRect Coin::getGlobalBounds() const{
+const sf::FloatRect Coin::getGlobalBounds() const {
     return _obj.getGlobalBounds();
+}
+
+void Coin::hide() {
+    _isHidden = true;
+    setPosition({-10, -10});
+}
+
+void Coin::notifyCollision() {
+    hide();
 }
 
 CoinManager::CoinManager(int n)
@@ -57,6 +71,6 @@ void CoinManager::draw(sf::RenderWindow &window) {
     }
 }
 
-const std::vector<Coin> &CoinManager::getCoins() {
+ std::vector<Coin> &CoinManager::getCoins() {
     return _coins;
 }

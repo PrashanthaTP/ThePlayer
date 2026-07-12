@@ -6,6 +6,8 @@ class Coin {
   private:
     int _val;
     float _radius;
+    sf::Vector2f _prevPos;
+    bool _isHidden;
     sf::CircleShape _obj;
 
   public:
@@ -14,6 +16,8 @@ class Coin {
     void setPosition(sf::Vector2f pos);
     sf::Vector2f getPosition() const;
     const sf::FloatRect getGlobalBounds() const;
+    void hide();
+    void notifyCollision();
 };
 
 class CoinManager {
@@ -26,5 +30,5 @@ class CoinManager {
     CoinManager(int n);
     void update(sf::RenderWindow &window, float time);
     void draw(sf::RenderWindow &window);
-    const std::vector<Coin> &getCoins();
+    std::vector<Coin> &getCoins();
 };
