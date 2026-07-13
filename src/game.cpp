@@ -20,6 +20,8 @@ static std::vector<Platform> platforms;
 static PlatformManager platformManager(4);
 static CoinManager coinManager(4);
 
+static unsigned int score = 0;
+
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
     sf::FloatRect rect = sprite.getGlobalBounds();
@@ -188,6 +190,14 @@ void Engine::run() {
     text.setCharacterSize(21);
     text.setFillColor(sf::Color::Black);
 
+
+    sf::Text scoreText(font);
+    scoreText.setString("Score");
+    scoreText.setCharacterSize(21);
+    scoreText.setFillColor(sf::Color::Black);
+    scoreText.setPosition({GSettings.width-150.0f, 5.0f});
+
+
     // Set text's origin to its own center
     sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin({textRect.position.x + textRect.size.x / 2.0f,
@@ -302,6 +312,7 @@ void Engine::run() {
 
             platformManager.draw(window);
             coinManager.draw(window);
+            window.draw(scoreText);
             break;
         }
         default:
