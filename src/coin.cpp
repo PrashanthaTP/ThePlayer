@@ -42,6 +42,10 @@ void Coin::notifyCollision() {
     hide();
 }
 
+int Coin::getValue() {
+    return _val;
+}
+
 CoinManager::CoinManager(int n)
     : _n(n) {
     createCoins();
@@ -71,6 +75,6 @@ void CoinManager::draw(sf::RenderWindow &window) {
     }
 }
 
- std::vector<Coin> &CoinManager::getCoins() {
+std::vector<Coin> &CoinManager::getCoins() {
     return _coins;
 }

@@ -22,6 +22,10 @@ static CoinManager coinManager(4);
 
 static unsigned int score = 0;
 
+
+//TODO: avoid dangling pointer
+std::unique_ptr<sf::Text> scoreTextPtr;
+
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
     sf::FloatRect rect = sprite.getGlobalBounds();
@@ -119,7 +123,10 @@ void Engine::handleCollisions(Player &player) {
         if (const std::optional<sf::FloatRect> overlap =
                 coinBb.findIntersection(playerBb)) {
             coin.notifyCollision();
-            std::cout << "Coin collected!!\n";
+            score += coin.getValue();
+            if(scoreTextPtr) {
+                scoreTextPtr->setString("Score: "+std::to_string(score));
+            }
         }
     }
 
@@ -192,7 +199,8 @@ void Engine::run() {
 
 
     sf::Text scoreText(font);
-    scoreText.setString("Score");
+    scoreTextPtr.reset(&scoreText);
+    scoreText.setString("Score: 0");
     scoreText.setCharacterSize(21);
     scoreText.setFillColor(sf::Color::Black);
     scoreText.setPosition({GSettings.width-150.0f, 5.0f});

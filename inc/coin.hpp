@@ -18,6 +18,7 @@ class Coin {
     const sf::FloatRect getGlobalBounds() const;
     void hide();
     void notifyCollision();
+    int getValue();
 };
 
 class CoinManager {
