@@ -329,6 +329,7 @@ void Engine::run() {
 
         window.display();
     }
+    auto temp = scoreTextPtr.release();
 }
 
 } // namespace ThePlayer
