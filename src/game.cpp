@@ -24,7 +24,9 @@ static unsigned int score = 0;
 
 
 //TODO: avoid dangling pointer
-std::unique_ptr<sf::Text> scoreTextPtr;
+//std::unique_ptr<sf::Text> scoreTextPtr;
+sf::Font font;
+sf::Text scoreText(font);
 
 sf::RectangleShape addBoundingBox(const sf::RenderWindow &window,
                                   const sf::Sprite sprite) {
@@ -124,9 +126,9 @@ void Engine::handleCollisions(Player &player) {
                 coinBb.findIntersection(playerBb)) {
             coin.notifyCollision();
             score += coin.getValue();
-            if(scoreTextPtr) {
-                scoreTextPtr->setString("Score: "+std::to_string(score));
-            }
+            //if(scoreTextPtr) {
+                scoreText.setString("Score: "+std::to_string(score));
+            //}
         }
     }
 
@@ -186,7 +188,6 @@ void Engine::run() {
                             sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(30);
 
-    sf::Font font;
     if (!font.openFromFile("assets/fonts/ComicNeue-Regular.ttf")) {
         std::cerr << "Unable to open font\n";
         return exit(EXIT_FAILURE);
@@ -198,8 +199,8 @@ void Engine::run() {
     text.setFillColor(sf::Color::Black);
 
 
-    sf::Text scoreText(font);
-    scoreTextPtr.reset(&scoreText);
+    //sf::Text scoreText(font);
+    //scoreTextPtr.reset(&scoreText);
     scoreText.setString("Score: 0");
     scoreText.setCharacterSize(21);
     scoreText.setFillColor(sf::Color::Black);
@@ -329,7 +330,7 @@ void Engine::run() {
 
         window.display();
     }
-    auto temp = scoreTextPtr.release();
+    //auto temp = scoreTextPtr.release();
 }
 
 } // namespace ThePlayer
