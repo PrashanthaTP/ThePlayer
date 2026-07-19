@@ -1,6 +1,5 @@
 // TODO:
 // Game window -> creation at desktop center
-// Cursor -> pointer on clickable objects
 #include <cstdlib>
 #include <iostream>
 #include <memory>
