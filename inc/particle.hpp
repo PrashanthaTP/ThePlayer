@@ -4,19 +4,20 @@
 struct Particle {
     sf::Vector2f pos;
     sf::Vector2f velocity;
-    sf::Color color;
-    float lifetime;    // remaining time
-    float maxLifetime; // total time
+    sf::Time lifetime;    // remaining time
+    sf::Time maxLifetime; // total time
 };
 
-class ParticleSystem {
+class ParticleSystem : public sf::Drawable {
   private:
     std::vector<Particle> m_particles;
     sf::VertexArray m_vertices;
 
+    virtual void draw(sf::RenderTarget &target,
+                      sf::RenderStates states) const override;
+
   public:
     ParticleSystem();
-    void emitExplosion(sf::Vector2f pos, int count);
-    void update(float deltatime);
-    void draw(sf::RenderWindow &window);
+    void emit(sf::Vector2f pos, size_t count);
+    void update(sf::Time deltatime);
 };
