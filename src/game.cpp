@@ -10,6 +10,7 @@
 #include "constants.hpp"
 #include "game.hpp"
 #include "game_states.hpp"
+#include "particle.hpp"
 #include "platforms.hpp"
 #include "rng.hpp"
 
@@ -18,12 +19,12 @@ namespace ThePlayer {
 static std::vector<Platform> platforms;
 static PlatformManager platformManager(4);
 static CoinManager coinManager(4);
+static ParticleSystem particleSystem;
 
 static unsigned int score = 0;
 
-
-//TODO: avoid dangling pointer
-//std::unique_ptr<sf::Text> scoreTextPtr;
+// TODO: avoid dangling pointer
+// std::unique_ptr<sf::Text> scoreTextPtr;
 sf::Font font;
 sf::Text scoreText(font);
 
@@ -123,10 +124,11 @@ void Engine::handleCollisions(Player &player) {
         const sf::FloatRect coinBb = coin.getGlobalBounds();
         if (const std::optional<sf::FloatRect> overlap =
                 coinBb.findIntersection(playerBb)) {
+            particleSystem.emit(coin.getPosition(), 1000);
             coin.notifyCollision();
             score += coin.getValue();
-            //if(scoreTextPtr) {
-                scoreText.setString("Score: "+std::to_string(score));
+            // if(scoreTextPtr) {
+            scoreText.setString("Score: " + std::to_string(score));
             //}
         }
     }
@@ -187,6 +189,8 @@ void Engine::run() {
                             sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(30);
 
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+
     if (!font.openFromFile("assets/fonts/ComicNeue-Regular.ttf")) {
         std::cerr << "Unable to open font\n";
         return exit(EXIT_FAILURE);
@@ -197,14 +201,12 @@ void Engine::run() {
     text.setCharacterSize(21);
     text.setFillColor(sf::Color::Black);
 
-
-    //sf::Text scoreText(font);
-    //scoreTextPtr.reset(&scoreText);
+    // sf::Text scoreText(font);
+    // scoreTextPtr.reset(&scoreText);
     scoreText.setString("Score: 0");
     scoreText.setCharacterSize(21);
     scoreText.setFillColor(sf::Color::Black);
-    scoreText.setPosition({GSettings.width-150.0f, 5.0f});
-
+    scoreText.setPosition({GSettings.width - 150.0f, 5.0f});
 
     // Set text's origin to its own center
     sf::FloatRect textRect = text.getLocalBounds();
@@ -311,9 +313,10 @@ void Engine::run() {
             platformManager.update(window, time);
             InputState inputState = handleKeyPress();
             player.update(inputState);
+            particleSystem.update(sf::seconds(time));
             handleCollisions(player);
 
-            window.draw(bgSprite);
+            // window.draw(bgSprite);
 
             window.draw(player.getDrawObj());
             window.draw(groundLine);
@@ -321,6 +324,7 @@ void Engine::run() {
             platformManager.draw(window);
             coinManager.draw(window);
             window.draw(scoreText);
+            window.draw(particleSystem);
             break;
         }
         default:
@@ -329,7 +333,7 @@ void Engine::run() {
 
         window.display();
     }
-    //auto temp = scoreTextPtr.release();
+    // auto temp = scoreTextPtr.release();
 }
 
 } // namespace ThePlayer
