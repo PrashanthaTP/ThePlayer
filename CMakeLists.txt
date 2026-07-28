@@ -21,7 +21,8 @@ add_executable(main
             src/platforms.cpp
             src/rng.cpp
             src/collisions.cpp
-            src/coin.cpp)
+            src/coin.cpp
+            src/particle.cpp)
 target_include_directories(main PRIVATE inc)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
