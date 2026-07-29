@@ -1,5 +1,6 @@
 // TODO:
 // Game window -> creation at desktop center
+// Unlimited coin respawning
 #include <cstdlib>
 #include <iostream>
 #include <memory>
