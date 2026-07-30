@@ -24,6 +24,7 @@ class Coin {
 class CoinManager {
   private:
     int _n;
+    int _n_hidden;
     std::vector<Coin> _coins;
     void createCoins();
 

@@ -33,9 +33,10 @@ const sf::FloatRect Coin::getGlobalBounds() const {
     return _obj.getGlobalBounds();
 }
 
+//TODO: collision reaction should be controlled from CoinManager
 void Coin::hide() {
     _isHidden = true;
-    setPosition({-10, -10});
+    //setPosition({-10, -10});
 }
 
 void Coin::notifyCollision() {
@@ -47,12 +48,12 @@ int Coin::getValue() {
 }
 
 CoinManager::CoinManager(int n)
-    : _n(n) {
+    : _n(n),_n_hidden(0) {
+    _coins.reserve(_n);
     createCoins();
 }
 
 void CoinManager::createCoins() {
-    _coins.reserve(_n);
 
     float xOffset = 100;
     for (int i{0}; i < _n; i++) {
