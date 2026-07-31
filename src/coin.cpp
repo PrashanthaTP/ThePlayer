@@ -33,10 +33,26 @@ const sf::FloatRect Coin::getGlobalBounds() const {
     return _obj.getGlobalBounds();
 }
 
-//TODO: collision reaction should be controlled from CoinManager
+// TODO: collision reaction should be controlled from CoinManager
 void Coin::hide() {
     _isHidden = true;
-    //setPosition({-10, -10});
+    // setPosition({-10, -10});
+}
+
+void Coin::unhide() {
+    _isHidden = false;
+}
+
+bool Coin::isHidden() const {
+    return _isHidden;
+}
+
+void Coin::setHidden(bool shouldHide) {
+    if (shouldHide) {
+        hide();
+    } else {
+        unhide();
+    }
 }
 
 void Coin::notifyCollision() {
@@ -48,7 +64,8 @@ int Coin::getValue() {
 }
 
 CoinManager::CoinManager(int n)
-    : _n(n),_n_hidden(0) {
+    : _n(n),
+      _n_hidden(0) {
     _coins.reserve(_n);
     createCoins();
 }
@@ -67,12 +84,25 @@ void CoinManager::update(sf::RenderWindow &window, float time) {
 }
 
 void CoinManager::draw(sf::RenderWindow &window) {
-    bool once = true;
+    static int cnt = 0;
+    cnt++;
+    if (cnt % 5 == 0) {
+        cnt = 0;
+        int countHidden = 0;
+        for (auto &coin : _coins) {
+            if (coin.isHidden()) {
+                countHidden++;
+            }
+        }
+        if(countHidden==_coins.size()){
+            _coins.clear();
+            createCoins();
+        }
+
+    }
+
     for (auto &coin : _coins) {
         coin.draw(window);
-        if (once) {
-            once = false;
-        }
     }
 }
 

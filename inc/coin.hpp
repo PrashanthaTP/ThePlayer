@@ -16,7 +16,11 @@ class Coin {
     void setPosition(sf::Vector2f pos);
     sf::Vector2f getPosition() const;
     const sf::FloatRect getGlobalBounds() const;
+    //TODO! setVisibility api instead of separate ones
     void hide();
+    void unhide();
+    bool isHidden() const;
+    void setHidden(bool shouldHide);
     void notifyCollision();
     int getValue();
 };
