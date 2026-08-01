@@ -36,7 +36,7 @@ const sf::FloatRect Coin::getGlobalBounds() const {
 // TODO: collision reaction should be controlled from CoinManager
 void Coin::hide() {
     _isHidden = true;
-    // setPosition({-10, -10});
+    setPosition({-10, -10});
 }
 
 void Coin::unhide() {
@@ -88,17 +88,17 @@ void CoinManager::draw(sf::RenderWindow &window) {
     cnt++;
     if (cnt % 5 == 0) {
         cnt = 0;
+
         int countHidden = 0;
         for (auto &coin : _coins) {
             if (coin.isHidden()) {
                 countHidden++;
             }
         }
-        if(countHidden==_coins.size()){
+        if (countHidden == _coins.size()) {
             _coins.clear();
             createCoins();
         }
-
     }
 
     for (auto &coin : _coins) {
