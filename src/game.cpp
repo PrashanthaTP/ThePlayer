@@ -206,7 +206,7 @@ void Engine::run() {
     // scoreTextPtr.reset(&scoreText);
     scoreText.setString("Score: 0");
     scoreText.setCharacterSize(21);
-    scoreText.setFillColor(sf::Color::Black);
+    scoreText.setFillColor(sf::Color(255, 255, 255, 255));
     scoreText.setPosition({GSettings.width - 150.0f, 5.0f});
 
     // Set text's origin to its own center
